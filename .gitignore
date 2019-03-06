@@ -12,7 +12,6 @@
 /captures
 .externalNativeBuild
 
-#Android api kets
+#Android api keys
 /app/src/main/res/values/google_maps_api.xml
 /app/google-services.json
-google-services.json
