@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:showIn="@layout/homescreen_toolbar_main"
+        tools:context=".view.HomeScreen">
+
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/homScreen_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:layout_marginTop="0dp"
+            app:title=" "
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="0dp"/>
+
+    <fragment
+            android:layout_width="0dp"
+            android:layout_height="350dp"
+            android:id="@+id/homeScreenMap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            tools:context=".MapsActivity"
+            app:layout_constraintTop_toBottomOf="@+id/homScreen_toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/homeScreenMap"
+            android:id="@+id/homeScreen_RV"/>
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/add_post"
+            android:background="@color/colorPrimary"
+            android:id="@+id/homeScreen_addPoster"
+            app:layout_constraintEnd_toEndOf="@+id/homScreen_toolbar"
+            app:layout_constraintTop_toTopOf="@+id/homScreen_toolbar"
+            app:layout_constraintBottom_toBottomOf="@+id/homScreen_toolbar"
+            android:contentDescription="Plus icon" android:layout_marginEnd="5dp"/>
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_height="wrap_content" app:srcCompat="@drawable/menu"
+            android:id="@+id/homeScreeen_MenuButton"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="5dp" android:layout_marginStart="5dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
