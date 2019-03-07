@@ -1,4 +1,4 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import android.Manifest
 import android.content.Context
@@ -25,8 +25,6 @@ import android.os.Build
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
-import android.widget.LinearLayout
-import android.widget.ListAdapter
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -34,10 +32,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pawprint.model.User
-import com.example.pawprint.R
-import com.example.pawprint.model.CustomCallBack
-import com.example.pawprint.model.DogPoster
+import com.mwp.pawprint.model.User
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.CustomCallBack
+import com.mwp.pawprint.model.DogPoster
 import com.firebase.geofire.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.navigation.NavigationView
@@ -93,9 +91,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             drawer_layout.openDrawer(Gravity.LEFT)
         }
 
-        //Recycler View
-        //val test = DogPoster("name", "last seen", 1234567, "detail", 0.0, 0.0)
-        //val test2 = DogPoster("name2", "last seen", 1234567, "detail", 0.0, 0.0)
         homeScreen_RV.layoutManager = LinearLayoutManager(this)
         homeScreen_RV.adapter = DogPostAdapter(this, emptyList())
         homeScreen_RV.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
@@ -117,12 +112,14 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             }
         })
     }
+
     private fun navToAddNewPost() {
         val intent = Intent(this, NewLostDogPost::class.java)
         intent.putExtra("currUser", currUser)
         intent.putExtra("loc", mLastLocation)
         startActivity(intent)
     }
+
     public override fun onPause() {
         super.onPause()
 

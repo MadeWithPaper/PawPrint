@@ -1,6 +1,5 @@
-package com.example.pawprint.model
+package com.mwp.pawprint.model
 
-import android.location.Location
 import java.io.Serializable
 
 data class DogPoster (

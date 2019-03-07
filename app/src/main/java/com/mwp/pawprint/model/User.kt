@@ -1,4 +1,4 @@
-package com.example.pawprint.model
+package com.mwp.pawprint.model
 
 import java.io.Serializable
 

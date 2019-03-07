@@ -1,12 +1,12 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pawprint.R
-import com.example.pawprint.model.RecallData
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.RecallData
 import android.content.Intent
 import android.net.Uri
 import kotlinx.android.synthetic.main.food_recall_cell.view.*

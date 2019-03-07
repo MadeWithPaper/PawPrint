@@ -1,14 +1,14 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pawprint.R
-import com.example.pawprint.model.CustomCallBack
-import com.example.pawprint.model.DogPoster
-import com.example.pawprint.model.User
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.CustomCallBack
+import com.mwp.pawprint.model.DogPoster
+import com.mwp.pawprint.model.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase

@@ -1,4 +1,4 @@
-package com.example.pawprint
+package com.mwp.pawprint
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

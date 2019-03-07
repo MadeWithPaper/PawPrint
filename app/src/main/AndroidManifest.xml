@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.pawprint">
+          package="com.mwp.pawprint">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:allowBackup="true"
@@ -19,19 +19,19 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".view.FoodRecall">
+        <activity android:name="com.mwp.pawprint.view.FoodRecall">
         </activity>
-        <activity android:name=".view.DogPosterDetailView">
+        <activity android:name="com.mwp.pawprint.view.DogPosterDetailView">
         </activity>
-        <activity android:name=".view.History">
+        <activity android:name="com.mwp.pawprint.view.History">
         </activity>
-        <activity android:name=".view.NewLostDogPost">
+        <activity android:name="com.mwp.pawprint.view.NewLostDogPost">
         </activity>
-        <activity android:name=".view.Profile">
+        <activity android:name="com.mwp.pawprint.view.Profile">
         </activity>
-        <activity android:name=".view.SignUp">
+        <activity android:name="com.mwp.pawprint.view.SignUp">
         </activity>
-        <activity android:name=".view.Login">
+        <activity android:name="com.mwp.pawprint.view.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -52,10 +52,10 @@
         -->
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="@string/google_api_key"/>
+                android:value="@string/google_maps_key"/>
 
         <activity
-                android:name=".view.HomeScreen"
+                android:name="com.mwp.pawprint.view.HomeScreen"
                 android:theme="@style/NoActionBar">
         </activity>
     </application>

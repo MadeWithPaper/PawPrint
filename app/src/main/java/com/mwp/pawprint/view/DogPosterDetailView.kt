@@ -1,11 +1,9 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.pawprint.R
-import com.example.pawprint.model.DogPoster
-import com.example.pawprint.model.User
-import com.google.firebase.database.FirebaseDatabase
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.DogPoster
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 
 class DogPosterDetailView : AppCompatActivity() {
@@ -19,7 +17,7 @@ class DogPosterDetailView : AppCompatActivity() {
         dogPosterDetailToolbarTV.text = post.name
         dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
         dogPosterDetail_DescRV.text = post.details
-        dogPosterDetail_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
+        dogPoster_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
 
         //TODO pic
 

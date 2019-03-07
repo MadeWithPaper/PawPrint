@@ -1,4 +1,4 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pawprint.R
-import com.example.pawprint.model.RecallData
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.RecallData
 import kotlinx.android.synthetic.main.activity_food_recall.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import com.example.pawprint.model.AsyncResponse
+import com.mwp.pawprint.model.AsyncResponse
 
 
 class FoodRecall : AppCompatActivity() {

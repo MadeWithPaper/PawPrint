@@ -3,10 +3,10 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/nav_graph" app:startDestination="@id/login">
 
-    <activity android:id="@+id/login" android:name="com.example.pawprint.view.Login" android:label="activity_login"
+    <activity android:id="@+id/login" android:name="com.mwp.pawprint.view.Login" android:label="activity_login"
               tools:layout="@layout/activity_login"/>
-    <activity android:id="@+id/homeScreen" android:name="com.example.pawprint.view.HomeScreen"
+    <activity android:id="@+id/homeScreen" android:name="com.mwp.pawprint.view.HomeScreen"
               android:label="activity_home_screen" tools:layout="@layout/activity_home_screen"/>
-    <activity android:id="@+id/signUp" android:name="com.example.pawprint.view.SignUp" android:label="activity_sign_up"
+    <activity android:id="@+id/signUp" android:name="com.mwp.pawprint.view.SignUp" android:label="activity_sign_up"
               tools:layout="@layout/activity_sign_up"/>
 </navigation>

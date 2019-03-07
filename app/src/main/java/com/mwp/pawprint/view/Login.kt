@@ -1,4 +1,4 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
-import com.example.pawprint.model.User
-import com.example.pawprint.R
+import com.mwp.pawprint.model.User
+import com.mwp.pawprint.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

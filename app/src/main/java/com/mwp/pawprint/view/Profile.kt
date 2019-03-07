@@ -1,9 +1,9 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.pawprint.model.User
-import com.example.pawprint.R
+import com.mwp.pawprint.model.User
+import com.mwp.pawprint.R
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class Profile : AppCompatActivity() {

@@ -8,7 +8,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.pawprint"
+        applicationId "com.mwp.pawprint"
         minSdkVersion 20
         targetSdkVersion 28
         versionCode 1
@@ -33,6 +33,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.1.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.firebase:firebase-database:16.0.6'
+    implementation 'com.google.firebase:firebase-storage:16.0.5'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'

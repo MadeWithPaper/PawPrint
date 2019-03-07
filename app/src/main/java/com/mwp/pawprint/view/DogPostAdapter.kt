@@ -1,4 +1,4 @@
-package com.example.pawprint.view
+package com.mwp.pawprint.view
 
 import android.content.Context
 import android.content.Intent
@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pawprint.R
-import com.example.pawprint.model.DogPoster
+import com.mwp.pawprint.R
+import com.mwp.pawprint.model.DogPoster
 import kotlinx.android.synthetic.main.dog_post_cell.view.*
 
 
