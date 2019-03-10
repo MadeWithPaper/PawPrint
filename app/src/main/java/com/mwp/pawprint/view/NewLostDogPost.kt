@@ -21,8 +21,12 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import java.io.IOException
 import android.net.Uri
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.mwp.pawprint.R
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
 
 
@@ -33,7 +37,7 @@ class NewLostDogPost : AppCompatActivity() {
     private val CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE = 1046
     private val fileName: String = "output.png"
     private var filePath: Uri? = null
-
+    private val TAG = "NewLostDogPost"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +75,7 @@ class NewLostDogPost : AppCompatActivity() {
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE)
-    }
+    }//TODO check for empty image
 
     private fun postToDB(currUid : String) {
         val newPost = makeNewDogPoster()
@@ -101,9 +105,9 @@ class NewLostDogPost : AppCompatActivity() {
         val lastSeen = lostDog_lastSeen.text.toString()
         val details = lostDog_desc.text.toString()
 
-        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude)
+        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, "not set")
 
-        Log.i("NewLostPoster", "made new lost dog poster" + newPoster)
+        Log.i(TAG, "made new lost dog poster" + newPoster)
         return newPoster
     }
 
@@ -128,14 +132,27 @@ class NewLostDogPost : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
 
-        var uploadTask = imageRef.putBytes(data)
-        uploadTask.addOnFailureListener {
-            // Handle unsuccessful uploads
-            Log.d("NewLostDogPost", "upload failed")
-        }.addOnSuccessListener {
-            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-            // ...
-            Log.d("NewLostDogPost", "upload success: ${imageRef.downloadUrl}")
+        val urlTask = imageRef.putBytes(data).continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            return@Continuation imageRef.downloadUrl
+        }).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                Log.d(TAG, "pic upload complete $downloadUri")
+                updatePostPic(downloadUri.toString(), id)
+            } else {
+                // Handle failures
+                Log.e(TAG, "upload pic failed")
+            }
         }
+    }
+
+    private fun updatePostPic(url : String, key : String) {
+        database.child("LostDogs").child(key).child("picURL").setValue(url)
+        Log.i(TAG, "pic updated for $key to $url")
     }
 }
