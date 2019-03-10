@@ -18,7 +18,8 @@ import kotlinx.android.synthetic.main.activity_history.*
 class History : AppCompatActivity() {
 
     private var historyList : MutableList<DogPoster> = mutableListOf()
-
+    //TODO not sync up bug
+    //Possible fix constantly update histroy list on firebase based on near by instead of querying when entering history page
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)

@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import java.io.IOException
 import android.net.Uri
+import android.view.View
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -28,6 +29,7 @@ import com.mwp.pawprint.R
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 import java.io.ByteArrayOutputStream
 
 
@@ -106,7 +108,9 @@ class NewLostDogPost : AppCompatActivity() {
         val lastSeen = lostDog_lastSeen.text.toString()
         val details = lostDog_desc.text.toString()
 
-        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, "not set")
+        val user = FirebaseAuth.getInstance().currentUser
+
+        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, user!!.uid, "not set")
 
         Log.i(TAG, "made new lost dog poster" + newPoster)
         return newPoster

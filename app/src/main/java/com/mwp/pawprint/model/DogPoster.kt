@@ -10,14 +10,16 @@ data class DogPoster (
     var details : String,
     var lat : Double,
     var lon : Double,
+    var owner : String,
     var picURL : String
 
 ) : Serializable {
-    constructor() : this(postID = "Not Specify", name = "Not Specify", lastSeen = "Not Specify", contactNumber = "0000000".toInt(), details = "Not Specify", lat = 0.0, lon = 0.0, picURL = "not set")
+    constructor() : this(postID = "Not Specify", name = "Not Specify", lastSeen = "Not Specify", contactNumber = "0000000".toInt(), details = "Not Specify", lat = 0.0, lon = 0.0, owner = "no one", picURL = "not set")
 
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "postID" to postID,
+            "owner" to owner,
             "name" to name,
             "lastSeen" to lastSeen,
             "contactNumber" to contactNumber,

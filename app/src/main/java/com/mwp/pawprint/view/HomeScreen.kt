@@ -190,9 +190,11 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     var mCompletionListener : GeoFire.CompletionListener = object : GeoFire.CompletionListener {
         override fun onComplete(key: String?, error: DatabaseError?) {
             if (error != null) {
-                Toast.makeText(this@HomeScreen, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@HomeScreen, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "GeoFire upload error $error")
             } else {
-                Toast.makeText(this@HomeScreen, "geo fire upload success", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@HomeScreen, "geo fire upload success", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "GeoFire upload success")
             }
         }
     }
