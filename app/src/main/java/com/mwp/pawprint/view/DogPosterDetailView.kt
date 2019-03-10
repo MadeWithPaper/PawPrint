@@ -2,8 +2,10 @@ package com.mwp.pawprint.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.DogPoster
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 
 class DogPosterDetailView : AppCompatActivity() {
@@ -19,8 +21,12 @@ class DogPosterDetailView : AppCompatActivity() {
         dogPosterDetail_DescRV.text = post.details
         dogPoster_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
 
-        //TODO pic
-
+        if (post.picURL != "not set"){
+            Picasso.with(this@DogPosterDetailView).load(post.picURL).fit().into(dogPosterDetail_pic)
+        } else
+        {
+            Log.d("DogPosterDetailView", "pic empty or not set ${post.picURL}")
+        }
     }
 
 }

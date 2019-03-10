@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task
 import com.mwp.pawprint.R
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
 
 
@@ -116,8 +117,7 @@ class NewLostDogPost : AppCompatActivity() {
         if (requestCode == CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
             filePath = data.data
             try {
-                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
-                lostDog_pic.setImageBitmap(bitmap)
+                Picasso.with(this@NewLostDogPost).load(filePath).into(lostDog_pic)
             } catch (e: IOException) {
                 e.printStackTrace()
             }

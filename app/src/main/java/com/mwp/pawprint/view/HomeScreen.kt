@@ -59,7 +59,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var nearByMap : HashMap<String, DogPoster> = HashMap()
     private var nearByMarkerMap :  HashMap<String, DogPoster> = HashMap()
     private lateinit var currUid: String
-
+    private val TAG = "HomeScreen"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
@@ -101,14 +101,14 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         dbRef.child(currUid).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 currUser = dataSnapshot.getValue(User::class.java)!!
-                Log.i("Login", "got user " + currUser)
+                Log.i("$TAG Login", "got user " + currUser)
                 header_name.text = currUser.name
                 header_email.text = currUser.email
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
-                Log.w("Login", "loadPost:onCancelled", databaseError.toException())
+                Log.w("$TAG Login", "loadPost:onCancelled", databaseError.toException())
             }
         })
     }
@@ -202,13 +202,13 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         dbRef.child(postKey).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currDog = dataSnapshot.getValue(DogPoster::class.java)!!
-                Log.i("HomeScreen", "Found " + currDog)
+                Log.i(TAG, "Found $currDog")
                 callback.onCallBack(currDog)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
-                Log.w("HomeScreen", "loadPost:onCancelled", databaseError.toException())
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
             }
         })
     }
@@ -235,31 +235,33 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                         val marker = mMap.addMarker(MarkerOptions()
                             .position(LatLng(d.lat, d.lon))
                             .title(d.name))
-
+                        marker.showInfoWindow()
                         addToHistory(currUid, d)
                         nearByMap[key] = d
                         nearByMarkerMap[marker.id] = d
                         markers[key] = marker
-                        Log.d("HomeScreen", "map " + nearByMap.values)
-                        Log.d("HomeScreen", "markers" + markers.values)
+                        Log.d(TAG, "map " + nearByMap.values)
+                        Log.d(TAG, "markers" + markers.values)
                         nearByList.clear()
                         nearByList.addAll(nearByMap.values)
                         homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, nearByList)
                         homeScreen_RV.adapter!!.notifyDataSetChanged()
-                        Log.d("HomeScreen", "list" + nearByList.toString())
+                        Log.d(TAG, "list" + nearByList.toString())
                     }
                 })
 
             }
 
             override fun onKeyExited(key: String?) {
-                Toast.makeText(this@HomeScreen, "Leaving " + key, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@HomeScreen, "Leaving " + key, Toast.LENGTH_SHORT).show()
+                Log.i(TAG, "Leaving $key")
                 markers.remove(key)
                 nearByMap.remove(key)
             }
 
             override fun onKeyMoved(key: String?, location: GeoLocation?) {
-                Toast.makeText(this@HomeScreen, "found in move" + key, Toast.LENGTH_SHORT).show()
+               // Toast.makeText(this@HomeScreen, "found in move" + key, Toast.LENGTH_SHORT).show()
+                Log.i(TAG, "key moved $key")
 
             }
         })
@@ -267,6 +269,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     val mMapClickListener : GoogleMap.OnMarkerClickListener = object : GoogleMap.OnMarkerClickListener {
         override fun onMarkerClick(marker: Marker?): Boolean {
+            //marker!!.hideInfoWindow()
             val d = nearByMarkerMap[marker!!.id]
             val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
             intent.putExtra("dogPoster", d)
@@ -379,7 +382,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         when (item.itemId) {
             R.id.nav_profile -> {
                 // Handle the camera action
-                Log.i("HomeScreen", "nav item works")
+                Log.i(TAG, "nav item works")
                 val intent = Intent(this, Profile::class.java)
                 intent.putExtra("currUser", currUser)
                 startActivity(intent)

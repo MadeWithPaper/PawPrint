@@ -2,12 +2,14 @@ package com.mwp.pawprint.view
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.DogPoster
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.dog_post_cell.view.*
 
 
@@ -39,7 +41,13 @@ class DogPostAdapter (private val context: Context, private val posters : List<D
 class PosterViewHolder (val view : View) : RecyclerView.ViewHolder(view) {
 
     fun bindPost(post: DogPoster, context: Context) {
-        view.textView.text = post.name
+        view.postCell_name.text = post.name
+        if (post.picURL != "not set"){
+            Picasso.with(context).load(post.picURL).fit().into(view.postCell_Pic)
+        } else
+        {
+            Log.d("DogPostAdapter", "pic empty or not set ${post.picURL}")
+        }
     }
 }
 
