@@ -11,6 +11,8 @@ import com.mwp.pawprint.R
 import com.mwp.pawprint.model.DogPoster
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
+import com.google.firebase.storage.FirebaseStorage
+
 
 class DogPosterDetailView : AppCompatActivity() {
 
@@ -53,8 +55,19 @@ class DogPosterDetailView : AppCompatActivity() {
     }
 
     private fun removePoster(poster : DogPoster) {
+        //remove dog poster data
         FirebaseDatabase.getInstance().reference.child("LostDogs").child(poster.postID).removeValue()
+        //remove geofire entry
         FirebaseDatabase.getInstance().reference.child("GeoFireDog").child(poster.postID).removeValue()
+        //remove pic from storage
+        val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(poster.picURL)
+        photoRef.delete().addOnSuccessListener{
+            // File deleted successfully
+            Log.d(TAG, "onSuccess: deleted file")
+        }.addOnFailureListener{
+            // Uh-oh, an error occurred!
+            Log.d(TAG, "onFailure: did not delete file")
+        }
         Log.i(TAG, "removing post ${poster.postID}")
     }
 }
