@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationCallback
 import android.os.Build
+import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
@@ -32,17 +33,22 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mwp.pawprint.model.User
 import com.mwp.pawprint.R
-import com.mwp.pawprint.model.CustomCallBack
-import com.mwp.pawprint.model.DogPoster
 import com.firebase.geofire.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.database.*
+import com.mwp.pawprint.model.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import kotlinx.android.synthetic.main.homescreen_content.*
 import kotlinx.android.synthetic.main.nav_header_main.*
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
@@ -60,18 +66,24 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var nearByMarkerMap :  HashMap<String, DogPoster> = HashMap()
     private lateinit var currUid: String
     private val TAG = "HomeScreen"
+    private val PET_STORE = "pet_store"
+    private val VETERINARY_CARE = "veterinary_care"
+    private val PARK = "park"
+    private val BASE_URL = "https://maps.googleapis.com/"
+    private var compositeDisposable: CompositeDisposable? = null
+    private var test = true
+    //TODO optimize map for activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
         setSupportActionBar(homScreen_toolbar)
         currUid = intent.getStringExtra("currUid")
         //Maps and firebase
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.homeScreenMap) as SupportMapFragment
-//        database = FirebaseDatabase.getInstance().reference
-        mapFragment.getMapAsync(this)
         mLocationManager = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)!!
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.homeScreenMap) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
         //Nav menu
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -91,9 +103,14 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             drawer_layout.openDrawer(Gravity.LEFT)
         }
 
+        //recycler list view
         homeScreen_RV.layoutManager = LinearLayoutManager(this)
         homeScreen_RV.adapter = DogPostAdapter(this, emptyList())
         homeScreen_RV.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+
+        //places api
+        compositeDisposable = CompositeDisposable()
+
     }
 
     private fun loadUser(currUid : String) {
@@ -122,7 +139,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     public override fun onPause() {
         super.onPause()
-
         //stop location updates when Activity is no longer active
         if (mFusedLocationClient != null) {
             mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
@@ -134,7 +150,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         mMap.setOnMarkerClickListener(mMapClickListener)
-
+        //mMap.setMinZoomPreference(5f)
+        //mMap.setMaxZoomPreference(20f)
         mLocationRequest = LocationRequest()
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(mLocationRequest))
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
@@ -162,17 +179,23 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private var mLocationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            for (location in locationResult.locations) {
+        override fun onLocationResult(p0: LocationResult) {
+            //for (location in locationResult.locations) {
                 if (applicationContext != null) {
-                    mLastLocation = location
-                    val latLng = LatLng(location.latitude, location.longitude)
+                    mLastLocation = p0.lastLocation
+                    val latLng = LatLng(mLastLocation!!.latitude, mLastLocation!!.longitude)
                     setSearchCircle(latLng)
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, ZOOM_LEVEL))
+
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
                     getNearBy(latLng)
+                    if (test) {
+                        getNearByPlaces()
+                        test = false
+                    }
                 }
-            }
+            //}
         }
     }
 
@@ -291,6 +314,33 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             dbRef.child(currUid).child("historyList").setValue(newHistory)
         }
     }
+
+    private fun getNearByPlaces(){
+        val radius = 2000 //search radius within 200 meters
+        val apiKey : String = resources.getString(R.string.browser_key)
+        Log.d(TAG, "API KEY = $apiKey")
+        val requestInterface = Retrofit.Builder()
+                                .baseUrl(BASE_URL)
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                                .build().create(PlacesEndpointInterface::class.java)
+
+        compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(this::handleResponse))
+    }
+
+    //TODO better handle, place markers accordingly, restruct query to api call to only when move certain distance to save cost for now 
+    private fun handleResponse(placesList : Places) {
+        Log.i(TAG, "html_attributions ${placesList.htmlAttributions}")
+        placesList.results!!.forEach {
+            Log.i(TAG,"name: ${it.name} loc(lat, lng): ${it.geometry!!.location!!.lat}, ${it.geometry!!.location!!.lng}")
+        }
+        Log.i(TAG, "status ${placesList.status}")
+        Toast.makeText(this, "status ${placesList.status}", Toast.LENGTH_SHORT).show()
+    }
+
     val MY_PERMISSIONS_REQUEST_LOCATION = 99
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -391,6 +441,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             }
             R.id.nav_logout -> {
                 val intent = Intent(this, Login::class.java)
+                finishAffinity()
                 startActivity(intent)
             }
 
@@ -409,5 +460,11 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable?.clear()
+
     }
 }
