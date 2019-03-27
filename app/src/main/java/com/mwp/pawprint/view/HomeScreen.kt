@@ -53,7 +53,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private var mLocationManager: LocationManager? = null
-    val ZOOM_LEVEL = 18f
+    val ZOOM_LEVEL = 17f
     private lateinit var mMap: GoogleMap
     var mLocationRequest: LocationRequest? = null
     var mLastLocation: Location? = null
@@ -71,7 +71,9 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private val PARK = "park"
     private val BASE_URL = "https://maps.googleapis.com/"
     private var compositeDisposable: CompositeDisposable? = null
-    private var test = true
+    private var lastKnownLoc : Location? = null
+    private var initKnownLoc = true
+
     //TODO optimize map for activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,7 +150,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     override fun onMapReady(googleMap: GoogleMap) {
         //val mCircle : Circle? = null
         mMap = googleMap
-        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        //mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@HomeScreen, R.raw.style_json))
         mMap.setOnMarkerClickListener(mMapClickListener)
         //mMap.setMinZoomPreference(5f)
         //mMap.setMaxZoomPreference(20f)
@@ -183,17 +186,18 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             //for (location in locationResult.locations) {
                 if (applicationContext != null) {
                     mLastLocation = p0.lastLocation
+                    if (initKnownLoc){
+                        lastKnownLoc = mLastLocation
+                    }
                     val latLng = LatLng(mLastLocation!!.latitude, mLastLocation!!.longitude)
                     setSearchCircle(latLng)
                     //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, ZOOM_LEVEL))
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
+                    //mMap.clear()
                     getNearBy(latLng)
-                    if (test) {
-                        getNearByPlaces()
-                        test = false
-                    }
+                    getNearByPlaces()
                 }
             //}
         }
@@ -282,6 +286,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 Log.i(TAG, "Leaving $key")
                 markers.remove(key)
                 nearByMap.remove(key)
+                //mMap.clear()
             }
 
             override fun onKeyMoved(key: String?, location: GeoLocation?) {
@@ -316,29 +321,63 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun getNearByPlaces(){
-        val radius = 2000 //search radius within 200 meters
+        val radius = 200 //search radius within 200 meters
         val apiKey : String = resources.getString(R.string.browser_key)
-        Log.d(TAG, "API KEY = $apiKey")
-        val requestInterface = Retrofit.Builder()
-                                .baseUrl(BASE_URL)
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                                .build().create(PlacesEndpointInterface::class.java)
+        //Log.d(TAG, "API KEY = $apiKey")
 
-        compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(this::handleResponse))
+        if (queryUpdateByDistance()){
+            //do update
+            val requestInterface = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build().create(PlacesEndpointInterface::class.java)
+
+            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PARK, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse))
+
+            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse))
+
+            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PET_STORE, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse))
+
+        } else {
+            //distance displaced not enough to trigger update
+            //do nothing
+        }
     }
 
-    //TODO better handle, place markers accordingly, restruct query to api call to only when move certain distance to save cost for now 
+    //TODO better handle, place markers accordingly, restruct query to api call to only when move certain distance to save cost for now
     private fun handleResponse(placesList : Places) {
         Log.i(TAG, "html_attributions ${placesList.htmlAttributions}")
         placesList.results!!.forEach {
+            val marker = mMap.addMarker(MarkerOptions()
+                .position(LatLng(it.geometry!!.location!!.lat, it.geometry!!.location!!.lng))
+                .title(it.name))
+            marker.showInfoWindow()
             Log.i(TAG,"name: ${it.name} loc(lat, lng): ${it.geometry!!.location!!.lat}, ${it.geometry!!.location!!.lng}")
         }
         Log.i(TAG, "status ${placesList.status}")
         Toast.makeText(this, "status ${placesList.status}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun queryUpdateByDistance() : Boolean {
+        val distanceDifference = 50
+        val difference = mLastLocation!!.distanceTo(lastKnownLoc)
+
+        if (difference >= distanceDifference || initKnownLoc){
+            lastKnownLoc = mLastLocation
+            initKnownLoc = false
+            return true
+        }
+        return false
     }
 
     val MY_PERMISSIONS_REQUEST_LOCATION = 99

@@ -11,7 +11,8 @@ interface PlacesEndpointInterface {
     fun getData(@Query("location") location : String,
                 @Query("radius") radius : Int,
                 @Query("key") apiKey : String,
-                @Query("type") type : String
+                @Query("type") type : String,
+                @Query("opennow") open : Boolean
                 ) : Observable<Places>
 }
 
