@@ -310,11 +310,14 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun addToHistory(currUid: String, post : DogPoster) {
         val oldHistory = currUser.historyList
+        Log.d(TAG, "to add  ${post.postID}")
         if (oldHistory.contains(post.postID)) {
             //not new
         } else {
             //saw new poster add to list and update data base
             val newHistory = oldHistory.plus(post.postID)
+            Log.d(TAG, "oldlist $oldHistory")
+            Log.d(TAG, "newlist $newHistory")
             val dbRef = FirebaseDatabase.getInstance().getReference("users")
             dbRef.child(currUid).child("historyList").setValue(newHistory)
         }
@@ -365,7 +368,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             Log.i(TAG,"name: ${it.name} loc(lat, lng): ${it.geometry!!.location!!.lat}, ${it.geometry!!.location!!.lng}")
         }
         Log.i(TAG, "status ${placesList.status}")
-        Toast.makeText(this, "status ${placesList.status}", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "status ${placesList.status}", Toast.LENGTH_SHORT).show()
     }
 
     private fun queryUpdateByDistance() : Boolean {
@@ -486,7 +489,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
             R.id.nav_history -> {
                 val intent = Intent(this, History::class.java)
-                intent.putExtra("currUser", currUser)
+                intent.putExtra("currUserID", currUid)
                 startActivity(intent)
             }
 

@@ -11,4 +11,7 @@
     <string name="title_activity_exmaple">exmaple</string>
 
     <string name="history_toolbar_text">History</string>
+    <string name="profile_name_tv">Name: </string>
+    <string name="profile_email_tv">Email: </string>
+    <string name="profile_toolbar_text">Profile</string>
 </resources>

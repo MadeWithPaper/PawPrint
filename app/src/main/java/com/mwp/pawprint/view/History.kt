@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.CustomCallBack
 import com.mwp.pawprint.model.DogPoster
@@ -17,35 +18,55 @@ import kotlinx.android.synthetic.main.activity_history.*
 
 class History : AppCompatActivity() {
 
-    private var historyList : MutableList<DogPoster> = mutableListOf()
+    private var currHistoryList : MutableList<DogPoster> = mutableListOf()
+    private val TAG = "History.kt"
     //TODO not sync up bug
     //Possible fix constantly update histroy list on firebase based on near by instead of querying when entering history page
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
-
-        val currUser = intent.extras?.getSerializable("currUser") as User
-        fetchHistory(currUser)
+        fetchHistory()
+        //historyRV.adapter!!.notifyDataSetChanged()
 
         historyRV.layoutManager = LinearLayoutManager(this@History)
         historyRV.adapter = HistoryEntryAdapter(this@History, emptyList())
         historyRV.addItemDecoration(DividerItemDecoration(this@History, DividerItemDecoration.VERTICAL))
-
-        //updateHistoryUI(currUser)
     }
 
-    private fun fetchHistory(user : User) {
-        for (postID in user.historyList) {
-            Log.d("History", "PostID in History : $postID")
-            getDogByPostID(postID, object : CustomCallBack {
-                override fun onCallBack(value: Any) {
-                        historyList.add(value as DogPoster)
-                        historyRV.adapter = HistoryEntryAdapter(this@History, historyList)
-                        historyRV.adapter!!.notifyDataSetChanged()
-                    }
+    private fun fetchHistory() {
+        getHistoryListByID(object : CustomCallBack {
+            override fun onCallBack(value: Any) {
+                val history = value as List<*>
+                history.forEach {
+                    getDogByPostID(it.toString(), object : CustomCallBack {
+                        override fun onCallBack(value: Any) {
+                            currHistoryList.add(value as DogPoster)
+                            Log.d("History", "currlist $currHistoryList")
+                            historyRV.adapter = HistoryEntryAdapter(this@History, currHistoryList)
+                            historyRV.adapter!!.notifyDataSetChanged()
+                        }
+                    })
+                }
+            }
+        })
+    }
 
-            })
-        }
+    private fun getHistoryListByID (callback: CustomCallBack) {
+        val currUserID = FirebaseAuth.getInstance().currentUser!!.uid
+        val dbRef = FirebaseDatabase.getInstance().getReference("users")
+        dbRef.child(currUserID).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val currUser = dataSnapshot.getValue(User::class.java)!!
+                val historyList = currUser.historyList
+                callback.onCallBack(historyList)
+                //Log.i(TAG, "Found $currDog")
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        })
     }
 
     private fun getDogByPostID (postKey : String, callback: CustomCallBack) {

@@ -13,6 +13,7 @@ class Profile : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
         val currUser = intent.extras?.getSerializable("currUser") as User
 
-        profile_toolbar_text.text = currUser.name
+        profile_email.text = currUser.email
+        profile_name.text = currUser.name
     }
 }

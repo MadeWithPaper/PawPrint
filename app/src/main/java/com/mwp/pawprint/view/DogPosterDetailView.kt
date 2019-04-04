@@ -6,12 +6,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.DogPoster
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 import com.google.firebase.storage.FirebaseStorage
+import com.mwp.pawprint.model.CustomCallBack
+import com.mwp.pawprint.model.User
 
 
 class DogPosterDetailView : AppCompatActivity() {
@@ -59,6 +64,20 @@ class DogPosterDetailView : AppCompatActivity() {
         FirebaseDatabase.getInstance().reference.child("LostDogs").child(poster.postID).removeValue()
         //remove geofire entry
         FirebaseDatabase.getInstance().reference.child("GeoFireDog").child(poster.postID).removeValue()
+        //remove dog poster from history by id
+        getHistoryListByID(poster.postID, object : CustomCallBack {
+            override fun onCallBack(value: Any) {
+                val history = value as List<*>
+                var index = 0
+                history.forEach {
+                    if (it == poster.postID) {
+                        Log.d(TAG, "found ${poster.postID} at index $index")
+                        FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").child(index.toString()).setValue(null)
+                    }
+                    index ++
+                }
+            }
+        })
         //remove pic from storage
         val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(poster.picURL)
         photoRef.delete().addOnSuccessListener{
@@ -69,5 +88,23 @@ class DogPosterDetailView : AppCompatActivity() {
             Log.d(TAG, "onFailure: did not delete file")
         }
         Log.i(TAG, "removing post ${poster.postID}")
+    }
+
+    private fun getHistoryListByID (postID : String, callback: CustomCallBack) {
+        val currUserID = FirebaseAuth.getInstance().currentUser!!.uid
+        val dbRef = FirebaseDatabase.getInstance().getReference("users")
+        dbRef.child(currUserID).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val currUser = dataSnapshot.getValue(User::class.java)!!
+                val historyList = currUser.historyList
+                callback.onCallBack(historyList)
+                //Log.i(TAG, "Found $currDog")
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        })
     }
 }

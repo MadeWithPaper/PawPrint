@@ -19,6 +19,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
         <activity android:name="com.mwp.pawprint.view.FoodRecall">
         </activity>
         <activity android:name="com.mwp.pawprint.view.DogPosterDetailView">
