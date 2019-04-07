@@ -67,15 +67,10 @@ class DogPosterDetailView : AppCompatActivity() {
         //remove dog poster from history by id
         getHistoryListByID(poster.postID, object : CustomCallBack {
             override fun onCallBack(value: Any) {
-                val history = value as List<*>
-                var index = 0
-                history.forEach {
-                    if (it == poster.postID) {
-                        Log.d(TAG, "found ${poster.postID} at index $index")
-                        FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").child(index.toString()).setValue(null)
-                    }
-                    index ++
-                }
+                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").removeValue()
+                val history = value as ArrayList<*>
+                history.remove(poster.postID)
+                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").setValue(history)
             }
         })
         //remove pic from storage

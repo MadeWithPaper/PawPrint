@@ -37,6 +37,7 @@ import com.mwp.pawprint.R
 import com.firebase.geofire.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.mwp.pawprint.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -250,11 +251,13 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         val geoQuery = geoFire.queryAtLocation(GeoLocation(currLatLng.latitude, currLatLng.longitude), SEARCH_RADIUS)
         geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
             override fun onGeoQueryError(error: DatabaseError?) {
+                Log.d(TAG, "geo query error on $currLatLng")
             }
 
             override fun onGeoQueryReady() {
                 //Toast.makeText(this@HomeScreen, "geo fire found", Toast.LENGTH_SHORT).show()
                 //TODO remove markers once user leaves area, use hashmap to store location near, each cycle check map to remove
+                //mMap.clear()
             }
 
             override fun onKeyEntered(key: String?, location: GeoLocation?) {
@@ -300,33 +303,49 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     val mMapClickListener : GoogleMap.OnMarkerClickListener = object : GoogleMap.OnMarkerClickListener {
         override fun onMarkerClick(marker: Marker?): Boolean {
             //marker!!.hideInfoWindow()
-            val d = nearByMarkerMap[marker!!.id]
-            val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
-            intent.putExtra("dogPoster", d)
-            startActivity(intent)
+            if (nearByMarkerMap.containsKey(marker!!.id)) {
+                val d = nearByMarkerMap[marker!!.id]
+                val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
+                intent.putExtra("dogPoster", d)
+                startActivity(intent)
+            } else {
+                //near by place clicked on do nothing as of now
+            }
             return false
         }
     }
 
     private fun addToHistory(currUid: String, post : DogPoster) {
-        val oldHistory = currUser.historyList
-        Log.d(TAG, "to add  ${post.postID}")
-        if (oldHistory.contains(post.postID)) {
-            //not new
-        } else {
-            //saw new poster add to list and update data base
-            val newHistory = oldHistory.plus(post.postID)
-            Log.d(TAG, "oldlist $oldHistory")
-            Log.d(TAG, "newlist $newHistory")
-            val dbRef = FirebaseDatabase.getInstance().getReference("users")
-            dbRef.child(currUid).child("historyList").setValue(newHistory)
-        }
+        val currUserID = FirebaseAuth.getInstance().currentUser!!.uid
+        val dbRef = FirebaseDatabase.getInstance().getReference("users")
+        dbRef.child(currUserID).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val currUser = dataSnapshot.getValue(User::class.java)!!
+                val oldHistoryList = currUser.historyList
+                //callback.onCallBack(historyList)
+                //Log.i(TAG, "Found $currDog")
+                Log.d(TAG, "to add  ${post.postID}")
+                if (oldHistoryList.contains(post.postID)) {
+                    //not new
+                } else {
+                    //saw new poster add to list and update data base
+                    val newHistory = oldHistoryList.plus(post.postID)
+                    Log.d(TAG, "oldlist $oldHistoryList")
+                    Log.d(TAG, "newlist $newHistory")
+                    val dbRef = FirebaseDatabase.getInstance().getReference("users")
+                    dbRef.child(currUid).child("historyList").setValue(newHistory)
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        })
     }
 
     private fun getNearByPlaces(){
         val radius = 200 //search radius within 200 meters
         val apiKey : String = resources.getString(R.string.browser_key)
-        //Log.d(TAG, "API KEY = $apiKey")
 
         if (queryUpdateByDistance()){
             //do update
@@ -336,16 +355,19 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build().create(PlacesEndpointInterface::class.java)
 
+            //google places api call for parks
             compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PARK, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))
 
+            //google places api call for vet
             compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))
 
+            //google places api call for pet store
             compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PET_STORE, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -357,7 +379,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         }
     }
 
-    //TODO better handle, place markers accordingly, restruct query to api call to only when move certain distance to save cost for now
     private fun handleResponse(placesList : Places) {
         Log.i(TAG, "html_attributions ${placesList.htmlAttributions}")
         placesList.results!!.forEach {
