@@ -54,12 +54,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private var mLocationManager: LocationManager? = null
-    val ZOOM_LEVEL = 17f
+    private val ZOOM_LEVEL = 17f
     private lateinit var mMap: GoogleMap
-    var mLocationRequest: LocationRequest? = null
+    private var mLocationRequest: LocationRequest? = null
     var mLastLocation: Location? = null
-    var mFusedLocationClient: FusedLocationProviderClient? = null
-    private val SEARCH_RADIUS = 0.0965
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    private val SEARCH_RADIUS = 100.0
     private lateinit var currUser : User
     private var nearByList : MutableList<DogPoster> = mutableListOf()
     private var markers : HashMap<String, Marker> = HashMap()
@@ -74,6 +74,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var compositeDisposable: CompositeDisposable? = null
     private var lastKnownLoc : Location? = null
     private var initKnownLoc = true
+    private var mapCircle : Circle? = null
 
     //TODO optimize map for activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,19 +150,13 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        //val mCircle : Circle? = null
         mMap = googleMap
-        //mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@HomeScreen, R.raw.style_json))
         mMap.setOnMarkerClickListener(mMapClickListener)
-        //mMap.setMinZoomPreference(5f)
-        //mMap.setMaxZoomPreference(20f)
         mLocationRequest = LocationRequest()
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(mLocationRequest))
-//        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
-        mLocationRequest?.setInterval(1000)
-        mLocationRequest?.setFastestInterval(1000)
-        mLocationRequest?.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        mLocationRequest?.interval = 1000
+        mLocationRequest?.fastestInterval = 1000
+        mLocationRequest?.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(
@@ -171,20 +166,19 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             ) {
                 //Location Permission already granted
                 mFusedLocationClient?.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
-                mMap.setMyLocationEnabled(true)
+                mMap.isMyLocationEnabled = false
             } else {
                 //Request Location Permission
                 checkLocationPermission()
             }
         } else {
             mFusedLocationClient?.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
-            mMap.setMyLocationEnabled(true)
+            mMap.isMyLocationEnabled = false
         }
     }
 
     private var mLocationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-            //for (location in locationResult.locations) {
                 if (applicationContext != null) {
                     mLastLocation = p0.lastLocation
                     if (initKnownLoc){
@@ -192,26 +186,27 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                     }
                     val latLng = LatLng(mLastLocation!!.latitude, mLastLocation!!.longitude)
                     setSearchCircle(latLng)
-                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, ZOOM_LEVEL))
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
-                    //mMap.clear()
                     getNearBy(latLng)
                     getNearByPlaces()
                 }
-            //}
         }
     }
 
     private fun setSearchCircle(loc : LatLng) {
         if (mMap != null) {
-            mMap.addCircle(CircleOptions()
+            if(mapCircle != null){
+                mapCircle!!.remove()
+            }
+
+            mapCircle = mMap.addCircle(CircleOptions()
                     .center(loc)
                     .radius(SEARCH_RADIUS)
-                    .fillColor(Color.RED)
-                    .strokeColor(Color.RED)
-                    .strokeWidth(2f))
+                    .fillColor(447997695)
+                    .strokeColor(Color.BLUE)
+                    .strokeWidth(3f))
         }
     }
 
@@ -248,7 +243,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         val geoFire = GeoFire(posterLocation)
         //geoFire.setLocation("dog by apartment", GeoLocation(35.292985, -120.675861), mCompletionListener)
-        val geoQuery = geoFire.queryAtLocation(GeoLocation(currLatLng.latitude, currLatLng.longitude), SEARCH_RADIUS)
+        val geoQuery = geoFire.queryAtLocation(GeoLocation(currLatLng.latitude, currLatLng.longitude), SEARCH_RADIUS/1000.0)
         geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
             override fun onGeoQueryError(error: DatabaseError?) {
                 Log.d(TAG, "geo query error on $currLatLng")
@@ -257,7 +252,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             override fun onGeoQueryReady() {
                 //Toast.makeText(this@HomeScreen, "geo fire found", Toast.LENGTH_SHORT).show()
                 //TODO remove markers once user leaves area, use hashmap to store location near, each cycle check map to remove
-                //mMap.clear()
             }
 
             override fun onKeyEntered(key: String?, location: GeoLocation?) {
@@ -278,7 +272,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                         nearByList.addAll(nearByMap.values)
                         homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, nearByList)
                         homeScreen_RV.adapter!!.notifyDataSetChanged()
-                        Log.d(TAG, "list" + nearByList.toString())
+                        Log.d(TAG, "list $nearByList")
                     }
                 })
 
@@ -330,8 +324,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 } else {
                     //saw new poster add to list and update data base
                     val newHistory = oldHistoryList.plus(post.postID)
-                    Log.d(TAG, "oldlist $oldHistoryList")
-                    Log.d(TAG, "newlist $newHistory")
+                    //Log.d(TAG, "oldlist $oldHistoryList")
+                    //Log.d(TAG, "newlist $newHistory")
                     val dbRef = FirebaseDatabase.getInstance().getReference("users")
                     dbRef.child(currUid).child("historyList").setValue(newHistory)
                 }
@@ -389,7 +383,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             Log.i(TAG,"name: ${it.name} loc(lat, lng): ${it.geometry!!.location!!.lat}, ${it.geometry!!.location!!.lng}")
         }
         Log.i(TAG, "status ${placesList.status}")
-        //Toast.makeText(this, "status ${placesList.status}", Toast.LENGTH_SHORT).show()
     }
 
     private fun queryUpdateByDistance() : Boolean {
@@ -411,22 +404,15 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             ) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
                     .setPositiveButton("OK", DialogInterface.OnClickListener { dialogInterface, i ->
-                        //Prompt the user once explanation has been shown
                         ActivityCompat.requestPermissions(
                             this@HomeScreen,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -436,7 +422,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                     .create()
                     .show()
             } else {
-                // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -452,11 +437,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     ) {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_LOCATION -> {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
                     if (ContextCompat.checkSelfPermission(
                             this,
                             Manifest.permission.ACCESS_FINE_LOCATION
@@ -472,15 +453,11 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                     }
 
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
                 }
                 return
             }
-        }// other 'case' lines to check for other
-        // permissions this app might request
+        }
     }
 
     //nav menu
@@ -493,18 +470,16 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_profile -> {
-                // Handle the camera action
                 Log.i(TAG, "nav item works")
                 val intent = Intent(this, Profile::class.java)
                 intent.putExtra("currUser", currUser)
                 startActivity(intent)
             }
-            R.id.nav_logout -> {
-                val intent = Intent(this, Login::class.java)
-                finishAffinity()
+
+            R.id.nav_foodRecall -> {
+                val intent = Intent(this, FoodRecall::class.java)
                 startActivity(intent)
             }
 
@@ -514,10 +489,25 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 startActivity(intent)
             }
 
-            R.id.nav_foodRecall -> {
-                val intent = Intent(this, FoodRecall::class.java)
-                //intent.putExtra("currUser", currUser)
-                startActivity(intent)
+            R.id.nav_logout -> {
+                val builder = AlertDialog.Builder(this@HomeScreen)
+                builder.setTitle("Log out")
+                builder.setMessage("Are you sure you want to log out?")
+                builder.setPositiveButton("YES"){_,_ ->
+                    val intent = Intent(this, Login::class.java)
+                    finishAffinity()
+                    startActivity(intent)
+                }
+
+                builder.setNegativeButton("No"){_,_ ->
+                    //do nothing
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                }
+
+                val dialog: AlertDialog = builder.create()
+                dialog.show()
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+
             }
         }
 
@@ -528,6 +518,5 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable?.clear()
-
     }
 }
