@@ -12,6 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import android.app.Activity
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.view.MotionEvent
 
 class SignUp : AppCompatActivity() {
 
@@ -30,6 +34,19 @@ class SignUp : AppCompatActivity() {
         registerButton.setOnClickListener {
             addNewUser()
         }
+
+        signUp_name.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+                hideKeyboard(v)
+            }
+        }
+
+        signup_layout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                hideKeyboard(v)
+                return true
+            }
+        })
     }
 
     private fun addNewUser(){
@@ -86,7 +103,7 @@ class SignUp : AppCompatActivity() {
             return false
         }
 
-        if (!signUp_email.text.toString().contains(".com")) {
+        if (!signUp_email.text.toString().contains("@")) {
             signUp_email.setError("Ensure to enter a valid email account")
             return false
         }
@@ -98,6 +115,11 @@ class SignUp : AppCompatActivity() {
         val user = User(name, email, emptyList())
         database.child("users").child(uid).setValue(user)
         return user
+    }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }

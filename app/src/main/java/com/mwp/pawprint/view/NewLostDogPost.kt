@@ -21,7 +21,9 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import java.io.IOException
 import android.net.Uri
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -30,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
+import kotlinx.android.synthetic.main.activity_login.*
 import java.io.ByteArrayOutputStream
 
 
@@ -61,6 +64,13 @@ class NewLostDogPost : AppCompatActivity() {
         lostDog_selectImage.setOnClickListener {
             selectImageInAlbum()
         }
+
+        new_lost_dog_layout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                hideKeyboard(v)
+                return true
+            }
+        })
     }
 
     var mCompletionListener : GeoFire.CompletionListener = object : GeoFire.CompletionListener {
@@ -158,5 +168,10 @@ class NewLostDogPost : AppCompatActivity() {
     private fun updatePostPic(url : String, key : String) {
         database.child("LostDogs").child(key).child("picURL").setValue(url)
         Log.i(TAG, "pic updated for $key to $url")
+    }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

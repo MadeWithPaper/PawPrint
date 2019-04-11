@@ -1,10 +1,15 @@
 package com.mwp.pawprint.view
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Layout
 import android.text.TextUtils
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.mwp.pawprint.model.User
 import com.mwp.pawprint.R
@@ -31,6 +36,13 @@ class Login : AppCompatActivity() {
         login_button.setOnClickListener {
             logIn()
         }
+
+        login_layout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                hideKeyboard(v)
+                return true
+            }
+        })
     }
 
     private fun getUser (currUid : String) {
@@ -53,6 +65,7 @@ class Login : AppCompatActivity() {
     }
 
     private fun logIn(){
+        //TODO remove in release
         val testMode = true
         var email = ""
         var password = ""
@@ -106,5 +119,10 @@ class Login : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
