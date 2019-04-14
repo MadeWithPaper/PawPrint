@@ -67,9 +67,10 @@ class SignUp : AppCompatActivity() {
 
                     val currUser = saveUserToDB(it.result!!.user.uid, name, email)
 
-                    val intent = Intent(this, HomeScreen::class.java)
-                    intent.putExtra("currentUser", currUser)
-                    startActivity(intent)
+//                    val intent = Intent(this, HomeScreen::class.java)
+//                    intent.putExtra("currentUser", currUser)
+//                    startActivity(intent)
+                    loginNewUser(email, password)
 
                 } else {
                     //sign up failed
@@ -81,24 +82,47 @@ class SignUp : AppCompatActivity() {
             }
     }
 
+    private fun loginNewUser(email: String, password: String){
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d("SignInResult", "Successfully sign in for user with uid: ${it.result?.user?.uid}")
+                    signUp_name.text.clear()
+                    signUp_email.text.clear()
+                    signUp_password.text.clear()
+
+                    val intent = Intent(this, HomeScreen::class.java)
+                    intent.putExtra("currUid", it.result!!.user.uid)
+                    startActivity(intent)
+
+                } else {
+                    Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            .addOnFailureListener {
+                Log.d("SignInFailed", "Failed to create user: ${it.message}")
+            }
+    }
+
     private fun validateForm() : Boolean {
-        if (TextUtils.isEmpty(signUp_email.text.toString())){
-            signUp_email.setError("Email is a required field.")
-            return false
-        }
-
-        if (TextUtils.isEmpty(signUp_password.text.toString())) {
-            signUp_password.setError("Password is a required field.")
-            return false
-        }
-
         if (TextUtils.isEmpty(signUp_name.text.toString())) {
             signUp_name.setError("Name is a required field.")
             return false
         }
 
+        if (TextUtils.isEmpty(signUp_email.text.toString())){
+            signUp_email.setError("Email is a required field.")
+            return false
+        }
+
         if (!signUp_email.text.toString().contains("@")) {
             signUp_email.setError("Ensure to enter a valid email account")
+            return false
+        }
+
+        if (TextUtils.isEmpty(signUp_password.text.toString())) {
+            signUp_password.setError("Password is a required field.")
             return false
         }
 

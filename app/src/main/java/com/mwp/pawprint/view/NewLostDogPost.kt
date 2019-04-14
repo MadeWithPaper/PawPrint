@@ -104,7 +104,6 @@ class NewLostDogPost : AppCompatActivity() {
             builder.setMessage("Do you want to proceed without attaching a picture for this post?")
             builder.setPositiveButton("YES"){_,_ ->
                 postToDB(currUid)
-
             }
 
             builder.setNegativeButton("NO"){_,_ ->
