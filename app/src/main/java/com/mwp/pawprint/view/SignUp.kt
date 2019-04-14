@@ -35,12 +35,6 @@ class SignUp : AppCompatActivity() {
             addNewUser()
         }
 
-        signUp_name.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) {
-                hideKeyboard(v)
-            }
-        }
-
         signup_layout.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View, m: MotionEvent): Boolean {
                 hideKeyboard(v)
@@ -105,6 +99,11 @@ class SignUp : AppCompatActivity() {
 
         if (!signUp_email.text.toString().contains("@")) {
             signUp_email.setError("Ensure to enter a valid email account")
+            return false
+        }
+
+        if (signUp_password.text.length < 6){
+            signUp_password.setError("Password length must be greater than 6.")
             return false
         }
 

@@ -3,6 +3,7 @@ package com.mwp.pawprint.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
@@ -41,8 +42,9 @@ class DogPosterDetailView : AppCompatActivity() {
         }
         dogPosterDetailToolbarTV.text = post.name
         dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
-        dogPosterDetail_DescRV.text = post.details
+        dogPosterDetail_DescTV.text = post.details
         dogPoster_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
+        dogPosterDetail_DescTV.movementMethod = ScrollingMovementMethod()
 
         if (post.picURL != "not set"){
             Picasso.with(this@DogPosterDetailView).load(post.picURL).fit().into(dogPosterDetail_pic)

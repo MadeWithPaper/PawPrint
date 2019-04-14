@@ -62,6 +62,7 @@ class Login : AppCompatActivity() {
     private fun signUpNewUser () {
         val intent = Intent(this, SignUp::class.java)
         startActivity(intent)
+
     }
 
     private fun logIn(){

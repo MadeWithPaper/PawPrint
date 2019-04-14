@@ -18,12 +18,15 @@ import kotlinx.android.synthetic.main.activity_new_lost_dog_post.*
 import android.provider.MediaStore
 import android.app.Activity
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import java.io.IOException
 import android.net.Uri
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -58,7 +61,8 @@ class NewLostDogPost : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
 
         lostDog_postButton.setOnClickListener {
-            postToDB(currUid)
+            Log.d(TAG, "clicked")
+            checkPostImage(currUid)
         }
 
         lostDog_selectImage.setOnClickListener {
@@ -88,7 +92,34 @@ class NewLostDogPost : AppCompatActivity() {
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE)
-    }//TODO check for empty image
+    }
+
+    private fun checkPostImage(currUid : String) {
+        if (lostDog_pic.drawable == null || lostDog_pic.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.default_dog)!!.constantState){
+            //image not set
+            Log.d(TAG, "dog post image not set")
+            val builder = AlertDialog.Builder(this@NewLostDogPost)
+            builder.setTitle("Warning!")
+            builder.setIcon(R.drawable.warning)
+            builder.setMessage("Do you want to proceed without attaching a picture for this post?")
+            builder.setPositiveButton("YES"){_,_ ->
+                postToDB(currUid)
+
+            }
+
+            builder.setNegativeButton("NO"){_,_ ->
+
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+
+        }else{
+            //image set
+            postToDB(currUid)
+        }
+    }
 
     private fun postToDB(currUid : String) {
         val newPost = makeNewDogPoster()

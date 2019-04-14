@@ -21,7 +21,7 @@
     />
     <Button
             android:text="Log In"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/login_button"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,11 +33,11 @@
             android:textColor="#000"
             app:layout_constraintBottom_toTopOf="@+id/signUpText"/>
     <TextView
-            android:text="Dont have an account? Click here to Sign up now!"
+            android:text="@string/sign_up_text"
             android:clickable="true"
             android:focusable="true"
-            android:textColor="#000"
-            android:textSize="15sp"
+            android:textColor="@color/quantum_googblue900"
+            android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/signUpText"
@@ -46,6 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="50dp"
+
             app:layout_constraintBottom_toBottomOf="parent"/>
     <EditText
             android:layout_width="0dp"

@@ -8,4 +8,5 @@
     <string name="profile_name_tv">Name: </string>
     <string name="profile_email_tv">Email: </string>
     <string name="profile_toolbar_text">Profile</string>
+    <string name="sign_up_text"><u>Don\'t have an account? Click here to Sign up now!</u></string>
 </resources>
