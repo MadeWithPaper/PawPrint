@@ -1,11 +1,13 @@
 package com.mwp.pawprint.view
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -53,11 +55,25 @@ class DogPosterDetailView : AppCompatActivity() {
         }
 
         dogPosterDetail_found.setOnClickListener {
-            removePoster(post)
-            val intent = Intent(this, HomeScreen::class.java)
-            intent.putExtra("currUid", user!!.uid)
-            startActivity(intent)
-            finish()
+            val builder = AlertDialog.Builder(this@DogPosterDetailView)
+            builder.setTitle("Remove Post")
+            builder.setMessage("Are you sure you want to remove this lost dog poster?")
+            builder.setIcon(R.drawable.warning)
+            builder.setPositiveButton("YES"){_,_ ->
+                removePoster(post)
+                val intent = Intent(this, HomeScreen::class.java)
+                intent.putExtra("currUid", user!!.uid)
+                startActivity(intent)
+                finish()
+            }
+
+            builder.setNegativeButton("No"){_,_ ->
+                //do nothing
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
         }
     }
 

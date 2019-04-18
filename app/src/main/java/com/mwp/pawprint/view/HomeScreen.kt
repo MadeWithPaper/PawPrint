@@ -54,7 +54,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private var mLocationManager: LocationManager? = null
-    private val ZOOM_LEVEL = 17f
+    private val ZOOM_LEVEL = 17.5f
     private lateinit var mMap: GoogleMap
     private var mLocationRequest: LocationRequest? = null
     var mLastLocation: Location? = null

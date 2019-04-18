@@ -19,6 +19,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_login.*
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
+import android.view.KeyEvent
+
 
 class Login : AppCompatActivity() {
 
@@ -66,7 +71,7 @@ class Login : AppCompatActivity() {
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = false
+        val testMode = true
         var email = ""
         var password = ""
         if (testMode) {

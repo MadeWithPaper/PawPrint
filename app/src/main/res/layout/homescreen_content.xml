@@ -40,6 +40,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/homeScreenMap"
             android:id="@+id/homeScreen_RV"/>
+
     <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,13 +50,34 @@
             app:layout_constraintEnd_toEndOf="@+id/homScreen_toolbar"
             app:layout_constraintTop_toTopOf="@+id/homScreen_toolbar"
             app:layout_constraintBottom_toBottomOf="@+id/homScreen_toolbar"
-            android:contentDescription="Plus icon" android:layout_marginEnd="5dp"/>
+            android:contentDescription="Plus icon"
+            android:layout_marginEnd="5dp"/>
+
     <ImageButton
             android:layout_width="wrap_content"
             android:background="@color/colorPrimary"
-            android:layout_height="wrap_content" app:srcCompat="@drawable/menu"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/menu"
             android:id="@+id/homeScreeen_MenuButton"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="5dp" android:layout_marginStart="5dp"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"/>
+    <TextView
+            android:text="@string/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/homeScreenToolBarText"
+            app:layout_constraintStart_toEndOf="@+id/homeScreeen_MenuButton"
+            android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/homeScreen_addPoster"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/homeScreenMap"
+            android:layout_marginTop="8dp"
+            android:textSize="30sp"
+            android:textColor="#000"
+            app:layout_constraintTop_toTopOf="@+id/homScreen_toolbar"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
