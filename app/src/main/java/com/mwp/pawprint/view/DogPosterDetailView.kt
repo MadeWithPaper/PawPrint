@@ -67,14 +67,7 @@ class DogPosterDetailView : AppCompatActivity() {
         //remove geofire entry
         FirebaseDatabase.getInstance().reference.child("GeoFireDog").child(poster.postID).removeValue()
         //remove dog poster from history by id
-        getHistoryListByID(poster.postID, object : CustomCallBack {
-            override fun onCallBack(value: Any) {
-                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").removeValue()
-                val history = value as ArrayList<*>
-                history.remove(poster.postID)
-                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").setValue(history)
-            }
-        })
+        getHistoryListByID(poster.postID)
         //remove pic from storage
         val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(poster.picURL)
         photoRef.delete().addOnSuccessListener{
@@ -87,15 +80,17 @@ class DogPosterDetailView : AppCompatActivity() {
         Log.i(TAG, "removing post ${poster.postID}")
     }
 
-    private fun getHistoryListByID (postID : String, callback: CustomCallBack) {
-        val currUserID = FirebaseAuth.getInstance().currentUser!!.uid
+    private fun getHistoryListByID (postID : String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("users")
-        dbRef.child(currUserID).addListenerForSingleValueEvent(object : ValueEventListener {
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val currUser = dataSnapshot.getValue(User::class.java)!!
-                val historyList = currUser.historyList
-                callback.onCallBack(historyList)
-                //Log.i(TAG, "Found $currDog")
+                for (data in dataSnapshot.children){
+                    Log.d(TAG, "user detail: $data")
+                    val currUser = data.getValue(User::class.java)!!
+                    val historyList = currUser.historyList as ArrayList<*>
+                    historyList.remove(postID)
+                    FirebaseDatabase.getInstance().reference.child("users").child(data.key!!).child("historyList").setValue(historyList)
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

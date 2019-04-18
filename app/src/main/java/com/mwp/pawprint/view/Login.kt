@@ -66,7 +66,7 @@ class Login : AppCompatActivity() {
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = true
+        val testMode = false
         var email = ""
         var password = ""
         if (testMode) {
