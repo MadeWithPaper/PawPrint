@@ -23,6 +23,9 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.view.KeyEvent
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import kotlin.math.log
 
 
 class Login : AppCompatActivity() {
@@ -65,13 +68,15 @@ class Login : AppCompatActivity() {
         })
     }
     private fun signUpNewUser () {
+        login_email_et.text!!.clear()
+        login_password_et.text!!.clear()
         val intent = Intent(this, SignUp::class.java)
         startActivity(intent)
     }
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = true
+        val testMode = false
         var email = ""
         var password = ""
         if (testMode) {
@@ -82,44 +87,49 @@ class Login : AppCompatActivity() {
                 //one or more fileds are empty
                 return
             }
-            email = login_email.text.toString()
-            password = login_password.text.toString()
+            email = login_email_et.text.toString()
+            password = login_password_et.text.toString()
+            //email = login_email.text.toString()
+            //password = login_password.text.toString()
         }
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     Log.d("SignInResult", "Successfully sign in for user with uid: ${it.result?.user?.uid}")
-                    login_email.text.clear()
-                    login_password.text.clear()
+                    login_email_et.text!!.clear()
+                    login_password_et.text!!.clear()
+                    //login_email.text.clear()
+                    //login_password.text.clear()
 
                     val intent = Intent(this, HomeScreen::class.java)
                     intent.putExtra("currUid", it.result!!.user.uid)
                     startActivity(intent)
 
                 } else {
-                    Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
+                    Log.e("SignInFailed", "failed to sign in with $email, $password")
+                    //Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
                 }
 
             }
             .addOnFailureListener {
-                Log.d("SignInFailed", "Failed to create user: ${it.message}")
+                Log.d("SignInFailed", "Failed to sign in ${it.message}")
             }
     }
 
     private fun validateForm() : Boolean {
-        if (TextUtils.isEmpty(login_email.text.toString())) {
-            login_email.setError("Email is empty.")
+        if (login_email_et.text!!.isEmpty()) {
+            login_email_til.error = "Email is a required field."
             return false
         }
 
-        if (TextUtils.isEmpty(login_password.text.toString())) {
-            login_password.setError("Password is empty.")
+        if (login_password_et.text!!.isEmpty()) {
+            login_password_til.error = "Password is a required field."
             return false
         }
 
-        if (!login_email.text.toString().contains("@")) {
-            login_email.setError("Ensure to enter a valid email account")
+        if (!login_email_et.text.toString().contains("@")) {
+            login_email_til.error = "Invalid Email"
             return false
         }
 

@@ -9,7 +9,6 @@
 
     <androidx.appcompat.widget.Toolbar
             android:layout_width="0dp"
-
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:theme="?attr/actionBarTheme"
@@ -83,7 +82,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/dogPosterDetail_found" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"
-            android:background="@color/colorRed"
+            android:background="@color/ColorSecondaryDark"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="20dp"
             android:visibility="invisible"/>

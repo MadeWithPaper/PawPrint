@@ -52,9 +52,6 @@ class NewLostDogPost : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_lost_dog_post)
 
-       // val IMAGE_UPLOADING_PERMISSION = 3
-       // ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), IMAGE_UPLOADING_PERMISSION)
-
         val currUser = intent.extras?.getSerializable("currUser") as User
         loc = intent.extras!!.get("loc") as Location
         val currUid = FirebaseAuth.getInstance().currentUser!!.uid
@@ -80,9 +77,9 @@ class NewLostDogPost : AppCompatActivity() {
     var mCompletionListener : GeoFire.CompletionListener = object : GeoFire.CompletionListener {
         override fun onComplete(key: String?, error: DatabaseError?) {
             if (error != null) {
-                Toast.makeText(this@NewLostDogPost, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@NewLostDogPost, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@NewLostDogPost, "geo fire upload success", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@NewLostDogPost, "geo fire upload success", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -143,14 +140,23 @@ class NewLostDogPost : AppCompatActivity() {
     }
 
     private fun makeNewDogPoster() : DogPoster{
-        val dogName = lostDog_name.text.toString()
-        val contactNumber = lostDog_contact.text.toString().toInt()
-        val lastSeen = lostDog_lastSeen.text.toString()
-        val details = lostDog_desc.text.toString()
+        var dogName = lostDog_name_et.text.toString()
+        var contactNumber = lostDog_contact_et.text.toString()
+        val lastSeen = lostDog_lastSeen_et.text.toString()
+        var details = lostDog_desc_et.text.toString()
 
         val user = FirebaseAuth.getInstance().currentUser
 
-        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, user!!.uid, "not set")
+        if (dogName == "") {
+            dogName = "Lost Dog"
+        }
+
+        if (contactNumber == ""){
+            contactNumber = "0"
+            details += "No contact number was provided, Please notify nearby animal shelter if found"
+        }
+
+        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber.toInt(), details, loc.latitude, loc.longitude, user!!.uid, "not set")
 
         Log.i(TAG, "made new lost dog poster" + newPoster)
         return newPoster
