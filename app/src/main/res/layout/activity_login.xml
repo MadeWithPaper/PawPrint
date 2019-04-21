@@ -19,36 +19,37 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-            style="@style/Widget.MaterialComponents.Button"
+    <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:text="Log In"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/login_button"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="10dp"
             android:textSize="40sp"
-            android:textColor="#fff"
-            app:layout_constraintBottom_toTopOf="@+id/signUpText"
-            android:layout_marginEnd="30dp"/>
-
-    <TextView
-            android:text="@string/sign_up_text"
-            android:clickable="true"
-            android:focusable="true"
-            android:textColor="@color/quantum_googblue900"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/signUpText"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="50dp"
+            android:textColor="#fff"
+            app:cornerRadius="40dp"
+            android:backgroundTint="@color/ColorSecondaryDark"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/signUp_button"
+            android:layout_marginStart="5dp"/>
 
+    <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="Sign Up"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/signUp_button"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="40dp"
+            android:textSize="40sp"
+            android:background="#fff"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:layout_marginBottom="50dp"
+            app:cornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -70,6 +71,7 @@
                 android:id="@+id/login_email_et"
                 android:imeOptions="actionNext"
                 android:lines="1"
+                android:drawableStart="@drawable/email_icon"
                 android:nextFocusForward="@id/login_password_et"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"/>
@@ -95,6 +97,7 @@
                 android:id="@+id/login_password_et"
                 android:imeOptions="actionDone"
                 android:lines="1"
+                android:drawableStart="@drawable/password_icon"
                 android:layout_height="wrap_content" android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.mwp.pawprint.view
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Layout
@@ -25,6 +26,7 @@ import android.widget.TextView.OnEditorActionListener
 import android.view.KeyEvent
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.firebase.database.collection.LLRBNode
 import kotlin.math.log
 
 
@@ -37,7 +39,7 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         auth = FirebaseAuth.getInstance()
 
-        signUpText.setOnClickListener {
+        signUp_button.setOnClickListener {
             signUpNewUser()
         }
 
@@ -118,12 +120,12 @@ class Login : AppCompatActivity() {
     }
 
     private fun validateForm() : Boolean {
-        if (login_email_et.text!!.isEmpty()) {
+        if (login_email_et.text.toString().isEmpty()) {
             login_email_til.error = "Email is a required field."
             return false
         }
 
-        if (login_password_et.text!!.isEmpty()) {
+        if (login_password_et.text.toString().isEmpty()) {
             login_password_til.error = "Password is a required field."
             return false
         }
