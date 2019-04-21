@@ -44,6 +44,7 @@ class Login : AppCompatActivity() {
         }
 
         login_button.setOnClickListener {
+            loginProgressBar.visibility = View.VISIBLE
             logIn()
         }
 
@@ -107,6 +108,7 @@ class Login : AppCompatActivity() {
                     val intent = Intent(this, HomeScreen::class.java)
                     intent.putExtra("currUid", it.result!!.user.uid)
                     startActivity(intent)
+                    loginProgressBar.visibility = View.INVISIBLE
 
                 } else {
                     Log.e("SignInFailed", "failed to sign in with $email, $password")

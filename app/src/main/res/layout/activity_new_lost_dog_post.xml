@@ -61,6 +61,7 @@
                 android:imeOptions="actionNext"
                 android:lines="1"
                 android:textSize="20sp"
+                android:drawableStart="@drawable/paw_icon"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -86,6 +87,7 @@
                 android:lines="1"
                 android:textSize="20sp"
                 android:layout_height="wrap_content"
+                android:drawableStart="@drawable/location_icon"
                 android:inputType="textEmailAddress"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,6 +112,7 @@
                 android:imeOptions="actionNext"
                 android:lines="1"
                 android:textSize="20sp"
+                android:drawableStart="@drawable/phone_icon"
                 android:layout_height="wrap_content"
                 android:inputType="number"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -138,6 +141,7 @@
                 android:imeOptions="actionDone"
                 android:textSize="20sp"
                 android:inputType="textMultiLine"
+                android:drawableStart="@drawable/info_icon"
                 android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
 
