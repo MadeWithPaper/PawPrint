@@ -57,12 +57,12 @@ class NewLostDogPost : AppCompatActivity() {
         val currUid = FirebaseAuth.getInstance().currentUser!!.uid
         database = FirebaseDatabase.getInstance().reference
 
-        lostDog_postButton.setOnClickListener {
+        addPostFloatingButton.setOnClickListener {
             Log.d(TAG, "clicked")
             checkPostImage(currUid)
         }
 
-        lostDog_selectImage.setOnClickListener {
+        openGalleryFloatingActionButton.setOnClickListener {
             selectImageInAlbum()
         }
 
@@ -156,7 +156,7 @@ class NewLostDogPost : AppCompatActivity() {
             details += "No contact number was provided, Please notify nearby animal shelter if found"
         }
 
-        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber.toInt(), details, loc.latitude, loc.longitude, user!!.uid, "not set")
+        val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, user!!.uid, "not set")
 
         Log.i(TAG, "made new lost dog poster" + newPoster)
         return newPoster

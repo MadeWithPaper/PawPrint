@@ -43,7 +43,7 @@ class DogPosterDetailView : AppCompatActivity() {
             Log.d(TAG, "user null, should never happen")
         }
         dogPosterDetailToolbarTV.text = post.name
-        if (post.contactNumber == 0) {
+        if (post.contactNumber == "0") {
             dogPosterDetail_NumberTV.visibility = View.INVISIBLE
         } else {
             dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
@@ -53,7 +53,7 @@ class DogPosterDetailView : AppCompatActivity() {
         if (post.lastSeen == "") {
             dogPoster_lastSeentv.visibility = View.INVISIBLE
         } else {
-            dogPoster_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
+            dogPoster_lastSeentv.text = "Last seen at: ${post.lastSeen}"
         }
         dogPosterDetail_DescTV.movementMethod = ScrollingMovementMethod()
 
