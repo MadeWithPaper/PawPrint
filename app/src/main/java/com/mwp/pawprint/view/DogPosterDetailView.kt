@@ -1,10 +1,13 @@
 package com.mwp.pawprint.view
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -40,9 +43,19 @@ class DogPosterDetailView : AppCompatActivity() {
             Log.d(TAG, "user null, should never happen")
         }
         dogPosterDetailToolbarTV.text = post.name
-        dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
-        dogPosterDetail_DescRV.text = post.details
-        dogPoster_lastSeentv.text = "Last Seen at: ${post.lastSeen}"
+        if (post.contactNumber == "0") {
+            dogPosterDetail_NumberTV.visibility = View.INVISIBLE
+        } else {
+            dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
+        }
+        dogPosterDetail_DescTV.text = post.details
+
+        if (post.lastSeen == "") {
+            dogPoster_lastSeentv.visibility = View.INVISIBLE
+        } else {
+            dogPoster_lastSeentv.text = "Last seen at: ${post.lastSeen}"
+        }
+        dogPosterDetail_DescTV.movementMethod = ScrollingMovementMethod()
 
         if (post.picURL != "not set"){
             Picasso.with(this@DogPosterDetailView).load(post.picURL).fit().into(dogPosterDetail_pic)
@@ -51,11 +64,25 @@ class DogPosterDetailView : AppCompatActivity() {
         }
 
         dogPosterDetail_found.setOnClickListener {
-            removePoster(post)
-            val intent = Intent(this, HomeScreen::class.java)
-            intent.putExtra("currUid", user!!.uid)
-            startActivity(intent)
-            finish()
+            val builder = AlertDialog.Builder(this@DogPosterDetailView)
+            builder.setTitle("Remove Post")
+            builder.setMessage("Are you sure you want to remove this lost dog poster?")
+            builder.setIcon(R.drawable.warning)
+            builder.setPositiveButton("YES"){_,_ ->
+                removePoster(post)
+                val intent = Intent(this, HomeScreen::class.java)
+                intent.putExtra("currUid", user!!.uid)
+                startActivity(intent)
+                finish()
+            }
+
+            builder.setNegativeButton("No"){_,_ ->
+                //do nothing
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
         }
     }
 
@@ -65,14 +92,7 @@ class DogPosterDetailView : AppCompatActivity() {
         //remove geofire entry
         FirebaseDatabase.getInstance().reference.child("GeoFireDog").child(poster.postID).removeValue()
         //remove dog poster from history by id
-        getHistoryListByID(poster.postID, object : CustomCallBack {
-            override fun onCallBack(value: Any) {
-                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").removeValue()
-                val history = value as ArrayList<*>
-                history.remove(poster.postID)
-                FirebaseDatabase.getInstance().reference.child("users").child(FirebaseAuth.getInstance().currentUser!!.uid).child("historyList").setValue(history)
-            }
-        })
+        getHistoryListByID(poster.postID)
         //remove pic from storage
         val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(poster.picURL)
         photoRef.delete().addOnSuccessListener{
@@ -85,15 +105,22 @@ class DogPosterDetailView : AppCompatActivity() {
         Log.i(TAG, "removing post ${poster.postID}")
     }
 
-    private fun getHistoryListByID (postID : String, callback: CustomCallBack) {
-        val currUserID = FirebaseAuth.getInstance().currentUser!!.uid
+    private fun getHistoryListByID (postID : String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("users")
-        dbRef.child(currUserID).addListenerForSingleValueEvent(object : ValueEventListener {
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val currUser = dataSnapshot.getValue(User::class.java)!!
-                val historyList = currUser.historyList
-                callback.onCallBack(historyList)
-                //Log.i(TAG, "Found $currDog")
+                for (data in dataSnapshot.children){
+                    Log.d(TAG, "user detail: $data")
+                    val currUser = data.getValue(User::class.java)!!
+                    val historyList = currUser.historyList as ArrayList<*>
+                    if (historyList.contains(postID)){
+                        //remove post from history
+                        historyList.remove(postID)
+                        FirebaseDatabase.getInstance().reference.child("users").child(data.key!!).child("historyList").setValue(historyList)
+                    } else {
+                        //do nothing
+                    }
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

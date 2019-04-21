@@ -54,7 +54,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private var mLocationManager: LocationManager? = null
-    private val ZOOM_LEVEL = 17f
+    private val ZOOM_LEVEL = 17.5f
     private lateinit var mMap: GoogleMap
     private var mLocationRequest: LocationRequest? = null
     var mLastLocation: Location? = null
@@ -75,6 +75,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var lastKnownLoc : Location? = null
     private var initKnownLoc = true
     private var mapCircle : Circle? = null
+    private var mapDot : Circle? = null
 
     //TODO optimize map for activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,6 +208,17 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                     .fillColor(447997695)
                     .strokeColor(Color.BLUE)
                     .strokeWidth(3f))
+
+            if(mapDot != null){
+                mapDot!!.remove()
+            }
+
+            mapDot = mMap.addCircle(CircleOptions()
+                .center(loc)
+                .radius(5.0)
+                .fillColor(Color.CYAN)
+                .strokeColor(Color.WHITE)
+                .strokeWidth(5f))
         }
     }
 
@@ -260,7 +272,9 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                         val d = value as DogPoster
                         val marker = mMap.addMarker(MarkerOptions()
                             .position(LatLng(d.lat, d.lon))
-                            .title(d.name))
+                            .title(d.name)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.paw_icon)))
+
                         marker.showInfoWindow()
                         addToHistory(currUid, d)
                         nearByMap[key] = d
@@ -379,6 +393,12 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             val marker = mMap.addMarker(MarkerOptions()
                 .position(LatLng(it.geometry!!.location!!.lat, it.geometry!!.location!!.lng))
                 .title(it.name))
+
+            when(it.types!![0]) {
+                PET_STORE -> marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.store_icon))
+                VETERINARY_CARE -> marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.vet_icon))
+                PARK -> marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.park_icon))
+            }
             marker.showInfoWindow()
             Log.i(TAG,"name: ${it.name} loc(lat, lng): ${it.geometry!!.location!!.lat}, ${it.geometry!!.location!!.lng}")
         }

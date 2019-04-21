@@ -18,10 +18,15 @@ import kotlinx.android.synthetic.main.activity_new_lost_dog_post.*
 import android.provider.MediaStore
 import android.app.Activity
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import java.io.IOException
 import android.net.Uri
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -30,6 +35,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
+import kotlinx.android.synthetic.main.activity_login.*
 import java.io.ByteArrayOutputStream
 
 
@@ -46,29 +52,34 @@ class NewLostDogPost : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_lost_dog_post)
 
-       // val IMAGE_UPLOADING_PERMISSION = 3
-       // ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), IMAGE_UPLOADING_PERMISSION)
-
         val currUser = intent.extras?.getSerializable("currUser") as User
         loc = intent.extras!!.get("loc") as Location
         val currUid = FirebaseAuth.getInstance().currentUser!!.uid
         database = FirebaseDatabase.getInstance().reference
 
-        lostDog_postButton.setOnClickListener {
-            postToDB(currUid)
+        addPostFloatingButton.setOnClickListener {
+            Log.d(TAG, "clicked")
+            checkPostImage(currUid)
         }
 
-        lostDog_selectImage.setOnClickListener {
+        openGalleryFloatingActionButton.setOnClickListener {
             selectImageInAlbum()
         }
+
+        new_lost_dog_layout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                hideKeyboard(v)
+                return true
+            }
+        })
     }
 
     var mCompletionListener : GeoFire.CompletionListener = object : GeoFire.CompletionListener {
         override fun onComplete(key: String?, error: DatabaseError?) {
             if (error != null) {
-                Toast.makeText(this@NewLostDogPost, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@NewLostDogPost, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@NewLostDogPost, "geo fire upload success", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@NewLostDogPost, "geo fire upload success", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -78,7 +89,33 @@ class NewLostDogPost : AppCompatActivity() {
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE)
-    }//TODO check for empty image
+    }
+
+    private fun checkPostImage(currUid : String) {
+        if (lostDog_pic.drawable == null || lostDog_pic.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.default_dog)!!.constantState){
+            //image not set
+            Log.d(TAG, "dog post image not set")
+            val builder = AlertDialog.Builder(this@NewLostDogPost)
+            builder.setTitle("Warning!")
+            builder.setIcon(R.drawable.warning)
+            builder.setMessage("Do you want to proceed without attaching a picture for this post?")
+            builder.setPositiveButton("YES"){_,_ ->
+                postToDB(currUid)
+            }
+
+            builder.setNegativeButton("NO"){_,_ ->
+
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+
+        }else{
+            //image set
+            postToDB(currUid)
+        }
+    }
 
     private fun postToDB(currUid : String) {
         val newPost = makeNewDogPoster()
@@ -103,12 +140,21 @@ class NewLostDogPost : AppCompatActivity() {
     }
 
     private fun makeNewDogPoster() : DogPoster{
-        val dogName = lostDog_name.text.toString()
-        val contactNumber = lostDog_contact.text.toString().toInt()
-        val lastSeen = lostDog_lastSeen.text.toString()
-        val details = lostDog_desc.text.toString()
+        var dogName = lostDog_name_et.text.toString()
+        var contactNumber = lostDog_contact_et.text.toString()
+        val lastSeen = lostDog_lastSeen_et.text.toString()
+        var details = lostDog_desc_et.text.toString()
 
         val user = FirebaseAuth.getInstance().currentUser
+
+        if (dogName == "") {
+            dogName = "Lost Dog"
+        }
+
+        if (contactNumber == ""){
+            contactNumber = "0"
+            details += "No contact number was provided, Please notify nearby animal shelter if found"
+        }
 
         val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, user!!.uid, "not set")
 
@@ -158,5 +204,10 @@ class NewLostDogPost : AppCompatActivity() {
     private fun updatePostPic(url : String, key : String) {
         database.child("LostDogs").child(key).child("picURL").setValue(url)
         Log.i(TAG, "pic updated for $key to $url")
+    }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

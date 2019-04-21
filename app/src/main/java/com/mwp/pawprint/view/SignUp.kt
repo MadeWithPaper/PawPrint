@@ -12,6 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import android.app.Activity
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.view.MotionEvent
 
 class SignUp : AppCompatActivity() {
 
@@ -30,6 +34,13 @@ class SignUp : AppCompatActivity() {
         registerButton.setOnClickListener {
             addNewUser()
         }
+
+        signup_layout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                hideKeyboard(v)
+                return true
+            }
+        })
     }
 
     private fun addNewUser(){
@@ -56,9 +67,10 @@ class SignUp : AppCompatActivity() {
 
                     val currUser = saveUserToDB(it.result!!.user.uid, name, email)
 
-                    val intent = Intent(this, HomeScreen::class.java)
-                    intent.putExtra("currentUser", currUser)
-                    startActivity(intent)
+//                    val intent = Intent(this, HomeScreen::class.java)
+//                    intent.putExtra("currentUser", currUser)
+//                    startActivity(intent)
+                    loginNewUser(email, password)
 
                 } else {
                     //sign up failed
@@ -70,9 +82,42 @@ class SignUp : AppCompatActivity() {
             }
     }
 
+    private fun loginNewUser(email: String, password: String){
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d("SignInResult", "Successfully sign in for user with uid: ${it.result?.user?.uid}")
+                    signUp_name.text.clear()
+                    signUp_email.text.clear()
+                    signUp_password.text.clear()
+
+                    val intent = Intent(this, HomeScreen::class.java)
+                    intent.putExtra("currUid", it.result!!.user.uid)
+                    startActivity(intent)
+
+                } else {
+                    Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            .addOnFailureListener {
+                Log.d("SignInFailed", "Failed to create user: ${it.message}")
+            }
+    }
+
     private fun validateForm() : Boolean {
+        if (TextUtils.isEmpty(signUp_name.text.toString())) {
+            signUp_name.setError("Name is a required field.")
+            return false
+        }
+
         if (TextUtils.isEmpty(signUp_email.text.toString())){
             signUp_email.setError("Email is a required field.")
+            return false
+        }
+
+        if (!signUp_email.text.toString().contains("@")) {
+            signUp_email.setError("Ensure to enter a valid email account")
             return false
         }
 
@@ -81,13 +126,8 @@ class SignUp : AppCompatActivity() {
             return false
         }
 
-        if (TextUtils.isEmpty(signUp_name.text.toString())) {
-            signUp_name.setError("Name is a required field.")
-            return false
-        }
-
-        if (!signUp_email.text.toString().contains(".com")) {
-            signUp_email.setError("Ensure to enter a valid email account")
+        if (signUp_password.text.length < 6){
+            signUp_password.setError("Password length must be greater than 6.")
             return false
         }
 
@@ -98,6 +138,11 @@ class SignUp : AppCompatActivity() {
         val user = User(name, email, emptyList())
         database.child("users").child(uid).setValue(user)
         return user
+    }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }
