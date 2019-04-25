@@ -25,7 +25,9 @@ import android.os.Build
 import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -44,6 +46,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_home_screen.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.homescreen_content.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import okhttp3.OkHttpClient
@@ -116,6 +119,13 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         //places api
         compositeDisposable = CompositeDisposable()
 
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent) : Boolean {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            logOut()
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private fun loadUser(currUid : String) {
@@ -510,29 +520,33 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             }
 
             R.id.nav_logout -> {
-                val builder = AlertDialog.Builder(this@HomeScreen)
-                builder.setTitle("Log out")
-                builder.setMessage("Are you sure you want to log out?")
-                builder.setPositiveButton("YES"){_,_ ->
-                    val intent = Intent(this, Login::class.java)
-                    finishAffinity()
-                    startActivity(intent)
-                }
-
-                builder.setNegativeButton("No"){_,_ ->
-                    //do nothing
-                    drawer_layout.closeDrawer(GravityCompat.START)
-                }
-
-                val dialog: AlertDialog = builder.create()
-                dialog.show()
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-
+                logOut()
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return false
+    }
+
+    private fun logOut(){
+        val builder = AlertDialog.Builder(this@HomeScreen)
+        builder.setTitle("Log out")
+        builder.setMessage("Are you sure you want to log out?")
+        builder.setPositiveButton("YES"){_,_ ->
+            val intent = Intent(this, Login::class.java)
+            finishAffinity()
+            startActivity(intent)
+        }
+
+        builder.setNegativeButton("No"){_,_ ->
+            //do nothing
+            drawer_layout.closeDrawer(GravityCompat.START)
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+
     }
 
     override fun onDestroy() {

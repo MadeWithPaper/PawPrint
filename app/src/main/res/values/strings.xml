@@ -5,8 +5,17 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="history_toolbar_text">History</string>
+    <string name="profile_toolbar_text">Profile</string>
+    <string name="email_tf_hint">Email</string>
+    <string name="password_tf_hint">Password</string>
+    <string name="sign_up_text">Sign Up</string>
+    <string name="log_in_text">Log In</string>
+    <string name="dog_name_tf_hint">Dog Name</string>
+    <string name="dog_loc_tf_hint">Last Seen (Location)</string>
+    <string name="new_lost_dog_post_toolbar_text">Report a New Lost Dog</string>
+    <string name="dog_contact_number">Contact Number</string>
+    <string name="dog_additional_info">Additional Information</string>
     <string name="profile_name_tv">Name: </string>
     <string name="profile_email_tv">Email: </string>
-    <string name="profile_toolbar_text">Profile</string>
-    <string name="sign_up_text"><u>Don\'t have an account? Click here to Sign up now!</u></string>
+    <string name="name_tf_hint">Name</string>
 </resources>

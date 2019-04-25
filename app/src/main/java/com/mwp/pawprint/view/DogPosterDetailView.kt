@@ -1,6 +1,7 @@
 package com.mwp.pawprint.view
 
 import android.content.Intent
+import android.content.Intent.createChooser
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -20,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 import com.google.firebase.storage.FirebaseStorage
 import com.mwp.pawprint.model.CustomCallBack
 import com.mwp.pawprint.model.User
-
+import android.net.Uri
 
 class DogPosterDetailView : AppCompatActivity() {
 
@@ -31,12 +33,14 @@ class DogPosterDetailView : AppCompatActivity() {
 
         val post = intent.extras?.getSerializable("dogPoster") as DogPoster
         val user = FirebaseAuth.getInstance().currentUser
-        dogPosterDetail_found.visibility = View.INVISIBLE
+        //dogPosterDetailFAB_found.visibility = View.INVISIBLE
+        //dogPosterDetailFAB_found.isVisible = false
 
         if (user != null) {
             // User is signed in
             if (post.owner == user.uid) {
-                dogPosterDetail_found.visibility = View.VISIBLE
+               // dogPosterDetailFAB_found.visibility = View.VISIBLE
+                dogPosterDetailFAB_found.isVisible = true
             }
         } else {
             // No user is signed in
@@ -63,7 +67,7 @@ class DogPosterDetailView : AppCompatActivity() {
             Log.d("DogPosterDetailView", "pic empty or not set ${post.picURL}")
         }
 
-        dogPosterDetail_found.setOnClickListener {
+        dogPosterDetailFAB_found.setOnClickListener {
             val builder = AlertDialog.Builder(this@DogPosterDetailView)
             builder.setTitle("Remove Post")
             builder.setMessage("Are you sure you want to remove this lost dog poster?")
@@ -83,6 +87,19 @@ class DogPosterDetailView : AppCompatActivity() {
             val dialog: AlertDialog = builder.create()
             dialog.show()
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+        }
+
+        dogPosterDetail_phoneFAB.setOnClickListener{
+            val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", post.contactNumber, null))
+            startActivity(intent)
+        }
+
+        dogPosterDetail_messageFAB.setOnClickListener{
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra("address", post.contactNumber)
+            val messagechooser = createChooser(intent, "Please Choose an Application to Send Messages...")
+            startActivity(messagechooser)
         }
     }
 

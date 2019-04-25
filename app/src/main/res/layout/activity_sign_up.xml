@@ -22,7 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
     <TextView
-            android:text="Sign Up"
+            android:text="@string/sign_up_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/signup_toolbar_text"
@@ -48,7 +48,7 @@
             android:layout_marginTop="20dp"
             app:errorEnabled="true"
             app:layout_constraintTop_toBottomOf="@+id/signUp_name_til"
-            android:hint="Email">
+            android:hint="@string/email_tf_hint">
 
         <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -75,7 +75,7 @@
             android:layout_marginEnd="30dp"
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
-            android:hint="Name">
+            android:hint="@string/name_tf_hint">
 
         <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -100,7 +100,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:hint="Password"
+            android:hint="@string/password_tf_hint"
             app:errorEnabled="true"
             app:counterEnabled="true"
             android:imeActionLabel="Done">
@@ -118,8 +118,8 @@
 
     <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:text="Sign Up"
-            android:textSize="50sp"
+            android:text="@string/sign_up_text"
+            android:textSize="40sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/registerButton"

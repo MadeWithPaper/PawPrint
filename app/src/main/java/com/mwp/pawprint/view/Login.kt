@@ -108,7 +108,7 @@ class Login : AppCompatActivity() {
                     val intent = Intent(this, HomeScreen::class.java)
                     intent.putExtra("currUid", it.result!!.user.uid)
                     startActivity(intent)
-                    loginProgressBar.visibility = View.INVISIBLE
+                    //loginProgressBar.visibility = View.INVISIBLE
 
                 } else {
                     Log.e("SignInFailed", "failed to sign in with $email, $password")
@@ -143,5 +143,10 @@ class Login : AppCompatActivity() {
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loginProgressBar.visibility = View.INVISIBLE
     }
 }
