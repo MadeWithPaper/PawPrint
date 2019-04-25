@@ -24,6 +24,8 @@ import com.mwp.pawprint.model.CustomCallBack
 import com.mwp.pawprint.model.User
 import android.net.Uri
 
+
+
 class DogPosterDetailView : AppCompatActivity() {
 
     private val TAG = "DogPosterDetailView"
@@ -46,7 +48,7 @@ class DogPosterDetailView : AppCompatActivity() {
             // No user is signed in
             Log.d(TAG, "user null, should never happen")
         }
-        dogPosterDetailToolbarTV.text = post.name
+        dogPosterDetail_name.text = post.name
         if (post.contactNumber == "0") {
             dogPosterDetail_NumberTV.visibility = View.INVISIBLE
         } else {
@@ -95,11 +97,7 @@ class DogPosterDetailView : AppCompatActivity() {
         }
 
         dogPosterDetail_messageFAB.setOnClickListener{
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra("address", post.contactNumber)
-            val messagechooser = createChooser(intent, "Please Choose an Application to Send Messages...")
-            startActivity(messagechooser)
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", post.contactNumber, null)))
         }
     }
 
