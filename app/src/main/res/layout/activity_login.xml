@@ -119,4 +119,17 @@
             app:layout_constraintBottom_toTopOf="@+id/login_email_til"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintVertical_bias="1.0"/>
+    <TextView
+            android:text="@string/login_error_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/login_error"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            android:textColor="@color/ColorError"
+            app:layout_constraintBottom_toBottomOf="@+id/loginProgressBar"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="50dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -79,7 +79,7 @@ class Login : AppCompatActivity() {
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = true
+        val testMode = false
         var email = ""
         var password = ""
         if (testMode) {
@@ -113,10 +113,19 @@ class Login : AppCompatActivity() {
                 } else {
                     Log.e("SignInFailed", "failed to sign in with $email, $password")
                     //Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
+
                 }
 
             }
             .addOnFailureListener {
+                //sho user log in error message
+                loginProgressBar.visibility = View.INVISIBLE
+                when(it.message){
+                    "The password is invalid or the user does not have a password." -> login_error.text = resources.getString(R.string.login_error_wrong_password)
+                    "There is no user record corresponding to this identifier. The user may have been deleted." -> login_error.text = resources.getString(R.string.login_error_wrong_email)
+                    else -> login_error.text = resources.getString(R.string.login_error_text)
+                }
+                login_error.visibility = View.VISIBLE
                 Log.d("SignInFailed", "Failed to sign in ${it.message}")
             }
     }
@@ -124,16 +133,19 @@ class Login : AppCompatActivity() {
     private fun validateForm() : Boolean {
         if (login_email_et.text.toString().isEmpty()) {
             login_email_til.error = "Email is a required field."
+            loginProgressBar.visibility = View.INVISIBLE
             return false
         }
 
         if (login_password_et.text.toString().isEmpty()) {
             login_password_til.error = "Password is a required field."
+            loginProgressBar.visibility = View.INVISIBLE
             return false
         }
 
         if (!login_email_et.text.toString().contains("@")) {
             login_email_til.error = "Invalid Email"
+            loginProgressBar.visibility = View.INVISIBLE
             return false
         }
 

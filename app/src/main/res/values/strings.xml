@@ -18,4 +18,7 @@
     <string name="profile_name_tv">Name: </string>
     <string name="profile_email_tv">Email: </string>
     <string name="name_tf_hint">Name</string>
+    <string name="login_error_text">Incorrect Email and/or Password.</string>
+    <string name="login_error_wrong_password">Incorrect Password</string>
+    <string name="login_error_wrong_email">Account does not exit</string>
 </resources>
