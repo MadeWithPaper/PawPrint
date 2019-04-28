@@ -34,16 +34,6 @@
             android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="@+id/lostDog_toolbar"
             app:layout_constraintBottom_toBottomOf="@+id/lostDog_toolbar"/>
-    <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:srcCompat="@drawable/default_dog"
-            android:id="@+id/lostDog_pic"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="30dp"
-            app:layout_constraintTop_toBottomOf="@+id/lostDog_toolbar"/>
 
     <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -54,12 +44,11 @@
             android:id="@+id/lostDog_name_til"
             android:layout_marginEnd="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/lostDog_pic"
             android:layout_marginStart="30dp"
             android:hint="@string/dog_name_tf_hint"
             android:imeOptions="actionNext"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView">
 
         <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -68,6 +57,7 @@
                 android:lines="1"
                 android:textSize="20sp"
                 android:drawableStart="@drawable/paw_icon"
+                android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -93,6 +83,7 @@
                 android:imeOptions="actionNext"
                 android:lines="1"
                 android:textSize="20sp"
+                android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/location_icon"
                 android:inputType="textEmailAddress"/>
@@ -120,6 +111,7 @@
                 android:lines="1"
                 android:textSize="20sp"
                 android:drawableStart="@drawable/phone_icon"
+                android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -149,6 +141,7 @@
                 android:textSize="20sp"
                 android:inputType="textMultiLine"
                 android:drawableStart="@drawable/info_icon"
+                android:drawablePadding="10dp"
                 android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -161,9 +154,7 @@
             app:srcCompat="@drawable/ic_menu_gallery"
             android:id="@+id/openGalleryFloatingActionButton"
             app:layout_constraintBottom_toTopOf="@+id/lostDog_name_til"
-            app:layout_constraintStart_toStartOf="@+id/lostDog_pic"
-            app:layout_constraintEnd_toEndOf="@+id/lostDog_pic"
-            android:layout_marginStart="150dp"/>
+            app:layout_constraintEnd_toEndOf="@+id/horizontalScrollView"/>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -175,5 +166,22 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
             app:layout_constraintBottom_toBottomOf="parent"/>
+    <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            app:layout_constraintTop_toBottomOf="@+id/lostDog_toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:scrollbars="horizontal"
+            android:orientation="horizontal"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            app:layout_constraintHorizontal_bias="0.0" android:id="@+id/horizontalScrollView">
+
+        <LinearLayout
+                android:id="@+id/imageGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"/>
+    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,11 +20,15 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.media.Image
 import java.io.IOException
 import android.net.Uri
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Continuation
@@ -37,16 +41,19 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 import kotlinx.android.synthetic.main.activity_login.*
 import java.io.ByteArrayOutputStream
+import java.net.URI
 
 
 class NewLostDogPost : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
     private lateinit var loc : Location
-    private val CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE = 1046
+    private val GALLERY_REQUEST_CODE = 13
     private val fileName: String = "output.png"
     private var filePath: Uri? = null
     private val TAG = "NewLostDogPost"
+    private var initIvList = mutableListOf<ImageView>()
+    private var uriSet = mutableSetOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,47 +81,55 @@ class NewLostDogPost : AppCompatActivity() {
         })
     }
 
-    var mCompletionListener : GeoFire.CompletionListener = object : GeoFire.CompletionListener {
-        override fun onComplete(key: String?, error: DatabaseError?) {
+    private var mCompletionListener : GeoFire.CompletionListener =
+        GeoFire.CompletionListener { key, error ->
             if (error != null) {
                 //Toast.makeText(this@NewLostDogPost, "geo fire upload error" + error, Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "geo fire upload error $error")
             } else {
                 //Toast.makeText(this@NewLostDogPost, "geo fire upload success", Toast.LENGTH_SHORT).show()
+                Log.i(TAG, "geo fire upload success")
             }
         }
-    }
 
     private fun selectImageInAlbum() {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE)
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//        intent.type = "image/*"
+//        intent.action = Intent.ACTION_PICK
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        startActivityForResult(Intent.createChooser(intent, "Select One or More Picture"), GALLERY_REQUEST_CODE)
     }
 
     private fun checkPostImage(currUid : String) {
-        if (lostDog_pic.drawable == null || lostDog_pic.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.default_dog)!!.constantState){
-            //image not set
-            Log.d(TAG, "dog post image not set")
-            val builder = AlertDialog.Builder(this@NewLostDogPost)
-            builder.setTitle("Warning!")
-            builder.setIcon(R.drawable.warning)
-            builder.setMessage("Do you want to proceed without attaching a picture for this post?")
-            builder.setPositiveButton("YES"){_,_ ->
-                postToDB(currUid)
-            }
 
-            builder.setNegativeButton("NO"){_,_ ->
-
-            }
-
-            val dialog: AlertDialog = builder.create()
-            dialog.show()
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
-
-        }else{
-            //image set
-            postToDB(currUid)
+        if(!validateForm()){
+            //invalid inputs detected
+            return
         }
+
+//        if (lostDog_pic.drawable == null || lostDog_pic.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.default_dog)!!.constantState){
+//            //image not set
+//            Log.d(TAG, "dog post image not set")
+//            val builder = AlertDialog.Builder(this@NewLostDogPost)
+//            builder.setTitle("Warning!")
+//            builder.setIcon(R.drawable.warning)
+//            builder.setMessage("Do you want to proceed without attaching a picture for this post?")
+//            builder.setPositiveButton("YES"){_,_ ->
+//                postToDB(currUid)
+//            }
+//
+//            builder.setNegativeButton("NO"){_,_ ->
+//
+//            }
+//
+//            val dialog: AlertDialog = builder.create()
+//            dialog.show()
+//            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED)
+//
+//        }else{
+            //image set
+            //postToDB(currUid)
+        //}
     }
 
     private fun postToDB(currUid : String) {
@@ -126,17 +141,22 @@ class NewLostDogPost : AppCompatActivity() {
         val posterLocation = FirebaseDatabase.getInstance().getReference("GeoFireDog")
         val geoFire = GeoFire(posterLocation)
         geoFire.setLocation(key, GeoLocation(loc.latitude, loc.longitude), mCompletionListener)
-//        val posterLocation = FirebaseDatabase.getInstance().getReference("GeoFireDog")
-//        val geoFire = GeoFire(posterLocation)
 
         uploadImage(key)
-        //geoFire.setLocation("dog by apartment", GeoLocation(35.292985, -120.675861), mCompletionListener)
         //post success back to home screen
         val intent = Intent(this, HomeScreen::class.java)
-        //intent.putExtra("currUser", currUser)
         intent.putExtra("currUid", currUid)
         startActivity(intent)
         finish()
+    }
+
+    private fun validateForm() : Boolean {
+        if (lostDog_contact_et.text.toString().isEmpty()) {
+            lostDog_contact.error = "Please enter a contact number."
+            return false
+        }
+
+        return true
     }
 
     private fun makeNewDogPoster() : DogPoster{
@@ -151,35 +171,93 @@ class NewLostDogPost : AppCompatActivity() {
             dogName = "Lost Dog"
         }
 
-        if (contactNumber == ""){
-            contactNumber = "0"
-            details += "No contact number was provided, Please notify nearby animal shelter if found"
+//        if (contactNumber == ""){
+//            contactNumber = "0"
+//            details += "No contact number was provided, Please notify nearby animal shelter if found"
+//        }
+
+        if (details.isEmpty()) {
+            details = "No additional information provided."
         }
 
         val newPoster = DogPoster("Not Set", dogName, lastSeen, contactNumber, details, loc.latitude, loc.longitude, user!!.uid, "not set")
 
-        Log.i(TAG, "made new lost dog poster" + newPoster)
+        Log.i(TAG, "made new lost dog poster $newPoster")
         return newPoster
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CHOOSE_PHOTO_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
-            filePath = data.data
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null && data.clipData != null) {
+            //remove place holder iv
+            if (initIvList.size > 0){
+                imageGallery.removeAllViews()
+                initIvList.clear()
+            }
+            val uriList = mutableListOf<Uri>()
             try {
-                Picasso.with(this@NewLostDogPost).load(filePath).into(lostDog_pic)
+                val imageCount = data.clipData.itemCount
+                Log.i(TAG, "item count from Gallery request $imageCount")
+                for (i in 0 until imageCount){
+                    val uri = data.clipData.getItemAt(i).uri
+                    Log.i(TAG, "uri at index $i is ${uri}")
+                    val uriSplit = uri.toString().splitToSequence("/").toList()
+                    Log.i(TAG, "uri split ${uriSplit[5]}")
+
+                    if (!uriSet.contains(uriSplit[5])){
+                        Log.d(TAG, "not in set adding $uri")
+                        uriList.add(uri)
+                    }
+                    uriSet.add(uriSplit[5])
+                }
+
+                uriList.forEach {
+                    imageGallery.addView(getImageView(it))
+                }
             } catch (e: IOException) {
                 e.printStackTrace()
+            } finally {
+                uriList.clear()
             }
+        } else if (resultCode == Activity.RESULT_CANCELED){
+            Log.e(TAG, "$requestCode result canceled")
+        } else if (data == null) {
+            Log.e(TAG, "data from gallery request is null")
+        } else if (data.clipData == null){
+            Log.e(TAG, "clipData from gallery request is null")
         }
+    }
+
+    private fun getImageView(uri: Uri) : View{
+        val iv = ImageView(applicationContext)
+        val lp = LinearLayout.LayoutParams(600, 500)
+        lp.gravity = Gravity.CENTER
+        iv.layoutParams = lp
+        Picasso
+            .with(this)
+            .load(uri)
+            .resize(600, 500)
+            //.fit()
+            .into(iv)
+        return iv
+    }
+
+    private fun setDefultImages(){
+        val defaultDogIV = ImageView(applicationContext)
+        val plusIconIV = ImageView(applicationContext)
+        initIvList.add(defaultDogIV)
+        initIvList.add(plusIconIV)
+
+        imageGallery.addView(defaultDogIV)
+        imageGallery.addView(plusIconIV)
     }
 
     private fun uploadImage(id: String) {
         val storageRef =  FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("DogPosterPic/$id.jpg")
-        val bitmap = (lostDog_pic.drawable as BitmapDrawable).bitmap
+        //val bitmap = (lostDog_pic.drawable as BitmapDrawable).bitmap
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
 
         val urlTask = imageRef.putBytes(data).continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->

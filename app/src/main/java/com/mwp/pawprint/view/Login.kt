@@ -27,7 +27,6 @@ import android.view.KeyEvent
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.database.collection.LLRBNode
-import kotlin.math.log
 
 
 class Login : AppCompatActivity() {
@@ -79,7 +78,7 @@ class Login : AppCompatActivity() {
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = false
+        val testMode = true
         var email = ""
         var password = ""
         if (testMode) {
@@ -92,8 +91,6 @@ class Login : AppCompatActivity() {
             }
             email = login_email_et.text.toString()
             password = login_password_et.text.toString()
-            //email = login_email.text.toString()
-            //password = login_password.text.toString()
         }
 
         auth.signInWithEmailAndPassword(email, password)
@@ -102,18 +99,12 @@ class Login : AppCompatActivity() {
                     Log.d("SignInResult", "Successfully sign in for user with uid: ${it.result?.user?.uid}")
                     login_email_et.text!!.clear()
                     login_password_et.text!!.clear()
-                    //login_email.text.clear()
-                    //login_password.text.clear()
 
                     val intent = Intent(this, HomeScreen::class.java)
                     intent.putExtra("currUid", it.result!!.user.uid)
                     startActivity(intent)
-                    //loginProgressBar.visibility = View.INVISIBLE
-
                 } else {
                     Log.e("SignInFailed", "failed to sign in with $email, $password")
-                    //Toast.makeText(this, "Failed to sign In", Toast.LENGTH_SHORT).show()
-
                 }
 
             }
