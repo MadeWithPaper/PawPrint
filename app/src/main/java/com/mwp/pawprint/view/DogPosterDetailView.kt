@@ -1,7 +1,6 @@
 package com.mwp.pawprint.view
 
 import android.content.Intent
-import android.content.Intent.createChooser
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -20,16 +19,19 @@ import com.mwp.pawprint.model.DogPoster
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dog_poster_detail_view.*
 import com.google.firebase.storage.FirebaseStorage
-import com.mwp.pawprint.model.CustomCallBack
 import com.mwp.pawprint.model.User
 import android.net.Uri
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
+import kotlinx.android.synthetic.main.activity_new_lost_dog_post.*
 
 class DogPosterDetailView : AppCompatActivity() {
 
     private val TAG = "DogPosterDetailView"
+    private val cropHeight = 700
+    private val cropWidth = 800
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dog_poster_detail_view)
@@ -43,7 +45,7 @@ class DogPosterDetailView : AppCompatActivity() {
             // User is signed in
             if (post.owner == user.uid) {
                // dogPosterDetailFAB_found.visibility = View.VISIBLE
-                dogPosterDetailFAB_found.isVisible = true
+                dogPosterDetail_foundFAB.isVisible = true
             }
         } else {
             // No user is signed in
@@ -70,10 +72,12 @@ class DogPosterDetailView : AppCompatActivity() {
                 detailImageGallery.addView(getImageView(it))
             }
         } else {
+            //user did not provide pic, use default
+            setDefaultImage()
             Log.d("DogPosterDetailView", "pic empty or not set")
         }
 
-        dogPosterDetailFAB_found.setOnClickListener {
+        dogPosterDetail_foundFAB.setOnClickListener {
             val builder = AlertDialog.Builder(this@DogPosterDetailView)
             builder.setTitle("Remove Post")
             builder.setMessage("Are you sure you want to remove this lost dog poster?")
@@ -105,26 +109,36 @@ class DogPosterDetailView : AppCompatActivity() {
         }
     }
 
+    private fun setDefaultImage(){
+        val defaultDogIV = ImageView(applicationContext)
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+        lp.gravity = Gravity.CENTER
+        defaultDogIV.layoutParams = lp
+        defaultDogIV.setImageResource(R.drawable.default_dog)
+        detailImageGallery.addView(defaultDogIV)
+    }
+
     private fun getImageView(url: String) : View{
         val iv = ImageView(applicationContext)
-        val lp = LinearLayout.LayoutParams(600, 500)
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, cropHeight)
         lp.gravity = Gravity.CENTER
         iv.layoutParams = lp
         Picasso
             .with(this)
             .load(url)
-            .resize(600, 500)
+            .resize(cropWidth, cropHeight)
+            .centerInside()
             .into(iv)
         return iv
     }
 
     private fun removePoster(poster : DogPoster) {
-        //remove dog poster data
-        FirebaseDatabase.getInstance().reference.child("LostDogs").child(poster.postID).removeValue()
-        //remove geofire entry
-        FirebaseDatabase.getInstance().reference.child("GeoFireDog").child(poster.postID).removeValue()
         //remove dog poster from history by id
         getHistoryListByID(poster.postID)
+        //remove dog poster data
+        FirebaseDatabase.getInstance().reference.child(resources.getString(R.string.dog_poster_firebase_path)).child(poster.postID).removeValue()
+        //remove geofire entry
+        FirebaseDatabase.getInstance().reference.child(resources.getString(R.string.dog_poster_geofire_path)).child(poster.postID).removeValue()
         //remove pic from storage
         poster.picURLs.forEach{
             val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(it)
@@ -144,7 +158,7 @@ class DogPosterDetailView : AppCompatActivity() {
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (data in dataSnapshot.children){
-                    Log.d(TAG, "user detail: $data")
+                    //Log.d(TAG, "user detail: $data")
                     val currUser = data.getValue(User::class.java)!!
                     val historyList = currUser.historyList as ArrayList<*>
                     if (historyList.contains(postID)){
@@ -161,6 +175,8 @@ class DogPosterDetailView : AppCompatActivity() {
                 // Getting Post failed, log a message
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
             }
+
+
         })
     }
 }

@@ -20,13 +20,11 @@ class History : AppCompatActivity() {
 
     private var currHistoryList : MutableList<DogPoster> = mutableListOf()
     private val TAG = "History.kt"
-    //TODO not sync up bug
-    //Possible fix constantly update histroy list on firebase based on near by instead of querying when entering history page
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
         fetchHistory()
-        //historyRV.adapter!!.notifyDataSetChanged()
 
         historyRV.layoutManager = LinearLayoutManager(this@History)
         historyRV.adapter = HistoryEntryAdapter(this@History, emptyList())

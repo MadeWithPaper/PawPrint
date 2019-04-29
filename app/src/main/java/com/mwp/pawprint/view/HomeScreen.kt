@@ -22,12 +22,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationCallback
 import android.os.Build
-import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MenuItem
-import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -35,21 +34,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mwp.pawprint.R
 import com.firebase.geofire.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.mwp.pawprint.R
 import com.mwp.pawprint.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_home_screen.*
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.homescreen_content.*
-import kotlinx.android.synthetic.main.nav_header_main.*
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -85,6 +81,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
         setSupportActionBar(homScreen_toolbar)
+        //nav_view.inflateHeaderView(R.layout.nav_header_main)
         currUid = intent.getStringExtra("currUid")
         //Maps and firebase
         mLocationManager = (getSystemService(Context.LOCATION_SERVICE) as LocationManager?)!!
@@ -92,6 +89,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         val mapFragment = supportFragmentManager.findFragmentById(R.id.homeScreenMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        //val nav = layoutInflater.inflate(R.layout.nav_header_main, nav_view)
         //Nav menu
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -100,8 +98,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
-
-        loadUser(currUid)
 
         homeScreen_addPoster.setOnClickListener {
             navToAddNewPost()
@@ -119,6 +115,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         //places api
         compositeDisposable = CompositeDisposable()
 
+        loadUser(currUid)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent) : Boolean {
@@ -134,8 +131,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 currUser = dataSnapshot.getValue(User::class.java)!!
                 Log.i("$TAG Login", "got user " + currUser)
-                header_name.text = currUser.name
-                header_email.text = currUser.email
+                nav_view.getHeaderView(0).findViewById<TextView>(R.id.header_name).text = currUser.name
+                nav_view.getHeaderView(0).findViewById<TextView>(R.id.header_email).text = currUser.email
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

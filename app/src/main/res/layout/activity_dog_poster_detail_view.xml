@@ -8,13 +8,14 @@
         tools:context=".view.DogPosterDetailView">
 
     <HorizontalScrollView
+            android:id="@+id/detailHorizontalScrollView"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="250dp"
             android:scrollbars="horizontal"
             android:orientation="horizontal"
             android:scrollbarAlwaysDrawHorizontalTrack="true"
             app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/detailHorizontalScrollView" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
@@ -58,7 +59,7 @@
             android:scrollbars="vertical"
             android:textAlignment="viewStart"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/dogPosterDetailFAB_found"/>
+            app:layout_constraintBottom_toTopOf="@+id/dogPosterDetail_foundFAB"/>
     <TextView
             android:layout_width="0dp"
             android:textSize="20sp"
@@ -82,7 +83,7 @@
             app:fabSize="auto"
             android:visibility="invisible"
             app:srcCompat="@drawable/location_off_icon"
-            android:id="@+id/dogPosterDetailFAB_found"
+            android:id="@+id/dogPosterDetail_foundFAB"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="20dp"

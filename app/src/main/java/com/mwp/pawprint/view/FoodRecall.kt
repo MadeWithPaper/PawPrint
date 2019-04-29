@@ -40,7 +40,7 @@ class FoodRecall : AppCompatActivity() {
 class FetchData(asyncResponse : AsyncResponse) : AsyncTask<Void, Void, MutableList<RecallData>>() {
     private val mRecallList : MutableList<RecallData> = mutableListOf()
     private val TAG = "FetchData Async"
-    private val dataURL = "https://www.fda.gov/AnimalVeterinary/SafetyHealth/RecallsWithdrawals/default.htm"
+    private val dataURL = "https://www.fda.gov/animal-veterinary/safety-health/recalls-withdrawals"
     private val prefixURL = "https://www.fda.gov"
     var delegate: AsyncResponse = asyncResponse
 
@@ -64,10 +64,11 @@ class FetchData(asyncResponse : AsyncResponse) : AsyncTask<Void, Void, MutableLi
         val doc : Document
         try {
             doc = Jsoup.connect(dataURL).get()
+            Log.i(TAG, "$doc")
             val table = doc.select("table[class=table table-bordered table-striped footable toggle-square-filled tablesorter]").first()
             val rows = table.select("tr")
             for (row in rows) {
-                System.out.println("===")
+               // System.out.println("===")
                 val cols = row.select("td")
                 var ind = 0
                 val newRecall = RecallData()

@@ -41,12 +41,12 @@ class DogPostAdapter (private val context: Context, private val posters : List<D
 class PosterViewHolder (val view : View) : RecyclerView.ViewHolder(view) {
 
     fun bindPost(post: DogPoster, context: Context) {
-
         view.postCell_name.text = post.name
         if (post.picURLs.isNotEmpty()){
             Picasso.with(context).load(post.picURLs.first()).fit().into(view.postCell_Pic)
         } else
         {
+            view.postCell_Pic.setImageResource(R.drawable.default_dog)
             Log.d("DogPostAdapter", "pic empty or not set")
         }
     }

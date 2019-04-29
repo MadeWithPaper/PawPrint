@@ -2,12 +2,15 @@ package com.mwp.pawprint.view
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.DogPoster
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.dog_post_cell.view.*
 import kotlinx.android.synthetic.main.history_entry_cell.view.*
 
 class HistoryEntryAdapter (private val context: Context, private val posters : List<DogPoster>) : RecyclerView.Adapter<HistoryViewHolder> () {
@@ -40,5 +43,12 @@ class HistoryViewHolder (val view : View) : RecyclerView.ViewHolder(view) {
     fun bindPost(post: DogPoster, context: Context) {
         view.historyName.text = post.name
         view.historyLastSeen.text = post.lastSeen
+        if (post.picURLs.isNotEmpty()){
+            Picasso.with(context).load(post.picURLs.first()).fit().into(view.historyPic)
+        } else
+        {
+            view.historyPic.setImageResource(R.drawable.default_dog)
+            Log.d("History", "pic empty or not set")
+        }
     }
 }

@@ -9,9 +9,11 @@
         android:maxHeight="100dp">
     <ImageView
             android:layout_width="0dp"
-            android:layout_height="wrap_content" tools:src="@tools:sample/avatars[6]"
+            android:layout_height="wrap_content"
+            tools:src="@tools:sample/avatars[6]"
             android:id="@+id/historyPic"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
     <TextView
             android:text="TextView"

@@ -8,8 +8,7 @@ import android.os.Bundle
 import android.text.Layout
 import android.text.TextUtils
 import android.util.Log
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.mwp.pawprint.model.User
@@ -20,13 +19,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_login.*
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-import android.widget.TextView.OnEditorActionListener
-import android.view.KeyEvent
-import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.firebase.database.collection.LLRBNode
 
 
 class Login : AppCompatActivity() {
@@ -44,6 +36,7 @@ class Login : AppCompatActivity() {
 
         login_button.setOnClickListener {
             loginProgressBar.visibility = View.VISIBLE
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             logIn()
         }
 

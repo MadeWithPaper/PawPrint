@@ -23,6 +23,7 @@ import android.net.Uri
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -48,13 +49,13 @@ class NewLostDogPost : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private lateinit var loc : Location
     private val GALLERY_REQUEST_CODE = 13
-    private val fileName: String = "output.png"
-    private var filePath: Uri? = null
     private val TAG = "NewLostDogPost"
     private var initIvList = mutableListOf<ImageView>()
     private var uriSet = mutableSetOf<String>()
     private val uriList = mutableListOf<Uri>()
     private var picUrls = mutableListOf<String>()
+    private val cropHeight = 700
+    private val cropWidth = 800
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +107,8 @@ class NewLostDogPost : AppCompatActivity() {
 
         if(!validateForm()){
             //invalid inputs detected
+            newPostProgressBar.visibility = View.INVISIBLE
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             return
         }
 
@@ -117,7 +120,9 @@ class NewLostDogPost : AppCompatActivity() {
             builder.setIcon(R.drawable.warning)
             builder.setMessage("Do you want to proceed without attaching a picture for this post?")
             builder.setPositiveButton("YES"){_,_ ->
-                postToDB(currUid)
+                newPostProgressBar.visibility = View.VISIBLE
+                window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                postToDB(currUid, true)
             }
 
             builder.setNegativeButton("NO"){_,_ ->
@@ -130,11 +135,13 @@ class NewLostDogPost : AppCompatActivity() {
 
         }else{
             //image set
+            newPostProgressBar.visibility = View.VISIBLE
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             postToDB(currUid)
         }
     }
 
-    private fun postToDB(currUid : String) {
+    private fun postToDB(currUid : String, notSet : Boolean = false) {
         val newPost = makeNewDogPoster()
         val key = database.push().key!!
         newPost.postID = key
@@ -144,20 +151,16 @@ class NewLostDogPost : AppCompatActivity() {
         val geoFire = GeoFire(posterLocation)
         geoFire.setLocation(key, GeoLocation(loc.latitude, loc.longitude), mCompletionListener)
 
+        if(notSet){
+            val intent = Intent(this, HomeScreen::class.java)
+            intent.putExtra("currUid", currUid)
+            startActivity(intent)
+            finish()
+        }
+
         for(i in 0 until uriList.size){
             uploadImage(uriList[i], key, i, currUid)
         }
-       // uploadImage(key)
-        //post success back to home screen
-        //Log.i(TAG, "pic url size ${picUrls.size}, urilist size: ${uriList.size}")
-//        while(picUrls.size == uriList.size){
-//            Log.i(TAG, "all pic urls are set start new intent")
-//            FirebaseDatabase.getInstance().reference.child(resources.getString(R.string.dog_poster_firebase_path)).child(key).child("picURLs").setValue(picUrls)
-//            val intent = Intent(this, HomeScreen::class.java)
-//            intent.putExtra("currUid", currUid)
-//            startActivity(intent)
-//            finish()
-       // }
     }
 
     private fun validateForm() : Boolean {
@@ -232,44 +235,31 @@ class NewLostDogPost : AppCompatActivity() {
 
     private fun getImageView(uri: Uri) : View{
         val iv = ImageView(applicationContext)
-        val lp = LinearLayout.LayoutParams(600, 500)
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, cropHeight)
         lp.gravity = Gravity.CENTER
         iv.layoutParams = lp
         Picasso
             .with(this)
             .load(uri)
-            .resize(600, 500)
-            //.fit()
+            .resize(cropWidth, cropHeight)
+            .centerInside()
             .into(iv)
         return iv
     }
 
     private fun setDefaultImages(){
         val defaultDogIV = ImageView(applicationContext)
-        val plusIconIV = ImageView(applicationContext)
-        val lp = LinearLayout.LayoutParams(600, 500)
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
         lp.gravity = Gravity.CENTER
         defaultDogIV.layoutParams = lp
-        plusIconIV.layoutParams = lp
-
         defaultDogIV.setImageResource(R.drawable.default_dog)
-        plusIconIV.setImageResource(R.drawable.ic_menu_gallery)
-
         initIvList.add(defaultDogIV)
-        initIvList.add(plusIconIV)
-
         imageGallery.addView(defaultDogIV)
-        imageGallery.addView(plusIconIV)
     }
 
     private fun uploadImage(uri: Uri, id: String, index: Int, currUid: String) {
         val storageRef =  FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("DogPosterPic/$id/$id$index.jpeg")
-        //val bitmap = (lostDog_pic.drawable as BitmapDrawable).bitmap
-        val baos = ByteArrayOutputStream()
-        //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-        var file = File(uri.path)
 
         val urlTask = imageRef.putFile(uri).continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
             if (!task.isSuccessful) {
@@ -302,24 +292,6 @@ class NewLostDogPost : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-//
-//        val dbRef = FirebaseDatabase.getInstance().getReference(resources.getString(R.string.dog_poster_firebase_path))
-//        dbRef.child(key).addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val currPoster = dataSnapshot.getValue(DogPoster::class.java)!!
-//                val picList = currPoster.picURLs as ArrayList<String>
-//                Log.i(TAG, "pic list size pre add: ${picList.size}")
-//                picList.add(url)
-//                Log.i(TAG, "pic list size post add: ${picList.size}")
-//                FirebaseDatabase.getInstance().reference.child(resources.getString(R.string.dog_poster_firebase_path)).child(key).child("picURLs").setValue(picList)
-//                picCount = picList.size
-//            }
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                // Getting Post failed, log a message
-//                Log.w(TAG, "updatePostPic:onCancelled", databaseError.toException())
-//            }
-//        })
-
     }
 
     private fun hideKeyboard(view: View) {
