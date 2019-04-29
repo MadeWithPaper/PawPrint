@@ -21,4 +21,7 @@
     <string name="login_error_text">Incorrect Email and/or Password.</string>
     <string name="login_error_wrong_password">Incorrect Password</string>
     <string name="login_error_wrong_email">Account does not exit</string>
+    <string name="dog_poster_firebase_path">LostDogs</string>
+    <string name="dog_poster_geofire_path">GeoFireDog</string>
+    <string name="firebase_user_path">users</string>
 </resources>

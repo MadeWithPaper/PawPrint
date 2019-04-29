@@ -15,13 +15,3 @@ interface PlacesEndpointInterface {
                 @Query("opennow") open : Boolean
                 ) : Observable<Places>
 }
-
-
-//fun createRetrofit(): Retrofit {
-//    val contentType = MediaType.get("application/json")
-//    return Retrofit.Builder()
-//        .addConverterFactory(serializationConverterFactory(contentType, JSON))
-//        .baseUrl(BASE_URL)
-//        .client(provideOkhttpClient())
-//        .build()
-//}

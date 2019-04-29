@@ -23,8 +23,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.mwp.pawprint.model.CustomCallBack
 import com.mwp.pawprint.model.User
 import android.net.Uri
-
-
+import android.view.Gravity
+import android.widget.ImageView
+import android.widget.LinearLayout
 
 class DogPosterDetailView : AppCompatActivity() {
 
@@ -48,7 +49,7 @@ class DogPosterDetailView : AppCompatActivity() {
             // No user is signed in
             Log.d(TAG, "user null, should never happen")
         }
-        dogPosterDetail_name.text = post.name
+        //dogPosterDetail_name.text = post.name
         if (post.contactNumber == "0") {
             dogPosterDetail_NumberTV.visibility = View.INVISIBLE
         } else {
@@ -63,10 +64,13 @@ class DogPosterDetailView : AppCompatActivity() {
         }
         dogPosterDetail_DescTV.movementMethod = ScrollingMovementMethod()
 
-        if (post.picURL != "not set"){
-            Picasso.with(this@DogPosterDetailView).load(post.picURL).fit().into(dogPosterDetail_pic)
+        if (post.picURLs.isNotEmpty()){
+           // Picasso.with(this@DogPosterDetailView).load(post.picURLs).fit().into(dogPosterDetail_pic)
+            post.picURLs.forEach {
+                detailImageGallery.addView(getImageView(it))
+            }
         } else {
-            Log.d("DogPosterDetailView", "pic empty or not set ${post.picURL}")
+            Log.d("DogPosterDetailView", "pic empty or not set")
         }
 
         dogPosterDetailFAB_found.setOnClickListener {
@@ -101,6 +105,19 @@ class DogPosterDetailView : AppCompatActivity() {
         }
     }
 
+    private fun getImageView(url: String) : View{
+        val iv = ImageView(applicationContext)
+        val lp = LinearLayout.LayoutParams(600, 500)
+        lp.gravity = Gravity.CENTER
+        iv.layoutParams = lp
+        Picasso
+            .with(this)
+            .load(url)
+            .resize(600, 500)
+            .into(iv)
+        return iv
+    }
+
     private fun removePoster(poster : DogPoster) {
         //remove dog poster data
         FirebaseDatabase.getInstance().reference.child("LostDogs").child(poster.postID).removeValue()
@@ -109,15 +126,17 @@ class DogPosterDetailView : AppCompatActivity() {
         //remove dog poster from history by id
         getHistoryListByID(poster.postID)
         //remove pic from storage
-        val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(poster.picURL)
-        photoRef.delete().addOnSuccessListener{
-            // File deleted successfully
-            Log.d(TAG, "onSuccess: deleted file")
-        }.addOnFailureListener{
-            // Uh-oh, an error occurred!
-            Log.d(TAG, "onFailure: did not delete file")
+        poster.picURLs.forEach{
+            val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(it)
+            photoRef.delete().addOnSuccessListener{
+                // File deleted successfully
+                Log.d(TAG, "onSuccess: deleted file")
+            }.addOnFailureListener{
+                // Uh-oh, an error occurred!
+                Log.d(TAG, "onFailure: did not delete file")
+            }
+            Log.i(TAG, "removing post ${poster.postID}")
         }
-        Log.i(TAG, "removing post ${poster.postID}")
     }
 
     private fun getHistoryListByID (postID : String) {

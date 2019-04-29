@@ -7,44 +7,23 @@
         android:layout_height="match_parent"
         tools:context=".view.DogPosterDetailView">
 
-    <RelativeLayout
+    <HorizontalScrollView
             android:layout_width="match_parent"
-            android:id="@+id/dogDetailView"
+            android:layout_height="240dp"
+            android:scrollbars="horizontal"
+            android:orientation="horizontal"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_height="240dp">
-
-        <ImageView
-                android:id="@+id/dogPosterDetail_pic"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="false"
-                android:cropToPadding="false"
-                android:scaleType="centerCrop"
-                android:src="@drawable/default_dog"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/detailHorizontalScrollView" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
+                android:id="@+id/detailImageGallery"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="horizontal"/>
+    </HorizontalScrollView>
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/dogPosterDetail_name"
-                    android:textStyle="bold"
-                    android:textSize="35sp"
-                    android:textColor="#FFFFFF"/>
-        </LinearLayout>
-
-    </RelativeLayout>
 
     <TextView
             android:textSize="20sp"
@@ -91,8 +70,8 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="30dp"
             app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toBottomOf="@+id/dogDetailView"/>
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/detailHorizontalScrollView"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -118,8 +97,8 @@
             android:focusable="true"
             app:srcCompat="@drawable/phone_icon"
             android:id="@+id/dogPosterDetail_phoneFAB"
-            android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/dogPosterDetail_messageFAB"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="@+id/dogDetailView"/>
+            android:layout_marginEnd="12dp" app:layout_constraintEnd_toStartOf="@+id/dogPosterDetail_messageFAB"
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="@+id/detailHorizontalScrollView"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
@@ -131,6 +110,6 @@
             android:id="@+id/dogPosterDetail_messageFAB"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/dogDetailView"/>
+            app:layout_constraintBottom_toBottomOf="@+id/detailHorizontalScrollView"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
