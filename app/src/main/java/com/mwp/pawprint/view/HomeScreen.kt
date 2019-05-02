@@ -39,6 +39,8 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.mwp.pawprint.googlePlacesAPI.Places
+import com.mwp.pawprint.googlePlacesAPI.PlacesEndpointInterface
 import com.mwp.pawprint.R
 import com.mwp.pawprint.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -371,19 +373,19 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 .build().create(PlacesEndpointInterface::class.java)
 
             //google places api call for parks
-            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PARK, true)
+            compositeDisposable?.add(requestInterface.getNearBy("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PARK, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))
 
             //google places api call for vet
-            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE, true)
+            compositeDisposable?.add(requestInterface.getNearBy("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, VETERINARY_CARE, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))
 
             //google places api call for pet store
-            compositeDisposable?.add(requestInterface.getData("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PET_STORE, true)
+            compositeDisposable?.add(requestInterface.getNearBy("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PET_STORE, true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))

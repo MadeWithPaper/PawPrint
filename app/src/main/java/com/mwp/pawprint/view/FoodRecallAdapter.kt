@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mwp.pawprint.R
-import com.mwp.pawprint.model.RecallData
+import com.mwp.pawprint.fdaAPI.RecallData
 import android.content.Intent
 import android.net.Uri
 import kotlinx.android.synthetic.main.food_recall_cell.view.*
@@ -29,8 +29,9 @@ class FoodRecallAdapter (private val context: Context, private val recalls : Lis
         holder.bindRecall(recall, context)
 
         holder.view.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(recall.link))
-            context.startActivity(browserIntent)
+            //TODO
+//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(recall.link))
+//            context.startActivity(browserIntent)
         }
     }
 }
@@ -38,9 +39,9 @@ class FoodRecallAdapter (private val context: Context, private val recalls : Lis
 class RecallViewHolder (val view : View) : RecyclerView.ViewHolder(view) {
 
     fun bindRecall(recall: RecallData, context: Context) {
-        view.recallProduct_TV.text = "Product: ${recall.productDesc}"
-        view.recallBrand_TV.text = "Brand: ${recall.brandName}"
-        view.recallProblem_TV.text = "Problem: ${recall.reason}"
-        view.recallDate_TV.text = recall.date
+//        view.recallProduct_TV.text = "Product: ${recall.productDesc}"
+//        view.recallBrand_TV.text = "Brand: ${recall.brandName}"
+//        view.recallProblem_TV.text = "Problem: ${recall.reason}"
+//        view.recallDate_TV.text = recall.date
     }
 }
