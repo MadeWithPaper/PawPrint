@@ -14,4 +14,12 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+    @Test
+    fun split_test(){
+        val raw = """<a href="/safety/recalls-market-withdrawals-safety-alerts/norbrook-laboratories-limited-expands-recall-veterinary-products">Norbrook Laboratories Limited</a>"""
+        val brandArray = raw.split(">")
+        val brandelement = brandArray.elementAt(brandArray.size-2)
+        val brand = brandelement.split("<").first()
+    }
 }

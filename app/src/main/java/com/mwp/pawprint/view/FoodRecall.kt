@@ -1,62 +1,73 @@
 package com.mwp.pawprint.view
 
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.common.reflect.TypeToken
+import com.google.gson.GsonBuilder
 import com.mwp.pawprint.R
-import com.mwp.pawprint.fdaAPI.FoodRecallEndpointInterface
-import com.mwp.pawprint.fdaAPI.RecallData
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import com.mwp.pawprint.fdaRecall.RecallData
 import kotlinx.android.synthetic.main.activity_food_recall.*
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import com.mwp.pawprint.model.AsyncResponse
+import kotlinx.io.IOException
+import okhttp3.*
 
 
 class FoodRecall : AppCompatActivity() {
 
-    //private var recallList : MutableList<RecallData> = mutableListOf()
+    private var recallList : MutableList<RecallData> = mutableListOf()
+    private val DATA_URL = "https://www.fda.gov/datatables-json/cvm-recalls-withdrawals-json"
     private val TAG = "FoodRecall.kt"
-    private var compositeDisposable: CompositeDisposable? = null
-    private val BASE_URL = "https://api.fda.gov/"
-    //https://api.fda.gov/animalandveterinary/event.json?search=animal.species:"Dog"&limit=1 (99max)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_recall)
 
-        compositeDisposable = CompositeDisposable()
-
-        getFoodRecallData()
+        fetchData()
 
         foodRecall_RV.layoutManager = LinearLayoutManager(this)
-        foodRecall_RV.adapter = FoodRecallAdapter(this, emptyList())
+        foodRecall_RV.adapter = FoodRecallAdapter(this, recallList)
         foodRecall_RV.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
-    private fun getFoodRecallData(){
-        val apiKey : String = resources.getString(R.string.fda_api_key)
+    private fun fetchData(){
+        val client = OkHttpClient()
 
-        val requestInterface = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build().create(FoodRecallEndpointInterface::class.java)
+        val request = Request.Builder()
+            .url(DATA_URL)
+            .build()
 
-        compositeDisposable?.add(requestInterface.getDogFoodRecall( """animal.species:"Dog"""", apiKey, 5)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(this::handleResponse))
+        client.newCall(request).enqueue(object: Callback {
+            override fun onResponse(call: Call?, response: Response?) {
+                val body = response?.body()?.string()
+
+                println(body)
+                val gson = GsonBuilder().create()
+                val products : List<RecallData> = gson.fromJson(body,  object : TypeToken<List<RecallData>>() {}.type)
+                products.forEach{
+                    it.brand = formatBrandName(it.brand!!)
+                    //Log.i(TAG, "$it")
+                }
+                runOnUiThread {
+                    foodRecall_RV.adapter = FoodRecallAdapter(applicationContext, products)
+                }
+            }
+            override fun onFailure(call: Call?, e: IOException?) {
+                Log.d("ERROR", "Failed to execute GET request to $DATA_URL")
+            }
+        })
     }
 
-    private fun handleResponse(recallList : RecallData) {
-        Log.i(TAG, "meta data ${recallList.meta}")
-
-        recallList.results!!.forEach {
-            Log.i(TAG, it.reportId)
-        }
+    //utility function used to strip away unnecessary character
+    private fun formatBrandName(unformatted : String) : String {
+        val unformattedList = unformatted.split(">")
+        val brandElement = unformattedList.elementAt(unformattedList.size-2)
+        return brandElement.split("<").first().trim()
     }
 }
