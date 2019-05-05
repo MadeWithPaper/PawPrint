@@ -50,12 +50,23 @@ class FoodRecall : AppCompatActivity() {
                 println(body)
                 val gson = GsonBuilder().create()
                 val products : List<RecallData> = gson.fromJson(body,  object : TypeToken<List<RecallData>>() {}.type)
-                products.forEach{
-                    it.brand = formatBrandName(it.brand!!)
-                    //Log.i(TAG, "$it")
+
+                val filteredRecallList = products.filter {
+                    it.description!!.contains("dog") ||
+                    it.brand!!.contains("dog") ||
+                    it.company!!.contains("dog") ||
+                    it.description!!.contains("Dog") ||
+                    it.brand!!.contains("Dog") ||
+                    it.company!!.contains("Dog")
                 }
+                val filteredFormattedRecallList : MutableList<RecallData> = mutableListOf()
+
+                filteredRecallList.forEach{
+                    filteredFormattedRecallList.add(fixFormat(it))
+                }
+
                 runOnUiThread {
-                    foodRecall_RV.adapter = FoodRecallAdapter(applicationContext, products)
+                    foodRecall_RV.adapter = FoodRecallAdapter(applicationContext, filteredFormattedRecallList.reversed())
                 }
             }
             override fun onFailure(call: Call?, e: IOException?) {
@@ -65,9 +76,25 @@ class FoodRecall : AppCompatActivity() {
     }
 
     //utility function used to strip away unnecessary character
-    private fun formatBrandName(unformatted : String) : String {
-        val unformattedList = unformatted.split(">")
+    private fun fixFormat(unformatted : RecallData) : RecallData {
+        //format brand name
+        val unformattedList = unformatted.brand!!.split(">")
         val brandElement = unformattedList.elementAt(unformattedList.size-2)
-        return brandElement.split("<").first().trim()
+        var formattedBrand = brandElement.split("<").first().trim()
+        formattedBrand = replace(formattedBrand)
+        val formattedDescription = replace(unformatted.description!!)
+        val formattedCompany = replace(unformatted.company!!)
+        val formattedReason = replace(unformatted.recallReason!!)
+
+        return RecallData(unformatted.path, unformatted.date, formattedBrand, formattedDescription, formattedReason, formattedCompany)
+    }
+
+    private fun replace(unformatted: String ) : String {
+        if (unformatted.contains("&#039;")){
+            return unformatted.replace("&#039;", "'", true)
+        } else if (unformatted.contains("&amp;")){
+            return unformatted.replace("&amp;", "&", true)
+        }
+        return unformatted
     }
 }

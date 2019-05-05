@@ -51,20 +51,18 @@ class DogPosterDetailView : AppCompatActivity() {
             // No user is signed in
             Log.d(TAG, "user null, should never happen")
         }
-        //dogPosterDetail_name.text = post.name
-        if (post.contactNumber == "0") {
-            dogPosterDetail_NumberTV.visibility = View.INVISIBLE
-        } else {
-            dogPosterDetail_NumberTV.text = "Contact Number: ${post.contactNumber}"
-        }
-        dogPosterDetail_DescTV.text = post.details
+        dogPosterDetailNameTV.text = "Name: ${post.name}"
+
+        dogPosterDetailNumberTV.text = "Contact: ${post.contactNumber}"
+
+        dogPosterDetailDescTV.text = post.details
 
         if (post.lastSeen == "") {
-            dogPoster_lastSeentv.visibility = View.INVISIBLE
+            dogPosterDetailLocTV.visibility = View.INVISIBLE
         } else {
-            dogPoster_lastSeentv.text = "Last seen at: ${post.lastSeen}"
+            dogPosterDetailLocTV.text = "Last seen at: ${post.lastSeen}"
         }
-        dogPosterDetail_DescTV.movementMethod = ScrollingMovementMethod()
+        dogPosterDetailDescTV.movementMethod = ScrollingMovementMethod()
 
         if (post.picURLs.isNotEmpty()){
            // Picasso.with(this@DogPosterDetailView).load(post.picURLs).fit().into(dogPosterDetail_pic)

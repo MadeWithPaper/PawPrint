@@ -43,9 +43,13 @@ class FoodRecallAdapter (private val context: Context, private val recalls : Lis
 class RecallViewHolder (val view : View) : RecyclerView.ViewHolder(view) {
 
     fun bindRecall(recall: RecallData, context: Context) {
-        view.recallProduct_TV.text = "Product: ${recall.description}"
+        view.recallDescription_TV.text = "Description: ${recall.description}"
         view.recallBrand_TV.text = "Brand: ${recall.brand}"
-        view.recallProblem_TV.text = "Problem: ${recall.recallReason}"
+        if (recall.recallReason == ""){
+            view.recallProblem_TV.text = "Problem: Not Stated"
+        } else {
+            view.recallProblem_TV.text = "Problem: ${recall.recallReason}"
+        }
         view.recallDate_TV.text = recall.date
     }
 }

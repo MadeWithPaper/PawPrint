@@ -20,6 +20,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.media.Image
 import java.io.IOException
 import android.net.Uri
+import android.telephony.PhoneNumberFormattingTextWatcher
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -82,6 +83,11 @@ class NewLostDogPost : AppCompatActivity() {
                 return true
             }
         })
+
+//        val phoneNumberFormattingTextWatcher = PhoneNumberFormattingTextWatcher()
+//        phoneNumberFormattingTextWatcher.onTextChanged("-", 1, 5, 3)
+
+        lostDog_contact_et.addTextChangedListener(PhoneNumberFormattingTextWatcher())
     }
 
     private var mCompletionListener : GeoFire.CompletionListener =
