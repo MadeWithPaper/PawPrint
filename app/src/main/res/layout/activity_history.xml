@@ -8,27 +8,18 @@
         tools:context=".view.History">
 
     <androidx.appcompat.widget.Toolbar
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:theme="?attr/actionBarTheme"
-            android:minHeight="?attr/actionBarSize"
             android:id="@+id/historyToolbar"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-    <TextView
-            android:text="@string/history_toolbar_text"
-            android:textSize="30sp"
-            android:textColor="#000"
-            android:textAlignment="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/historyToolbarTV" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="30dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:titleTextColor="#fff"
+            app:title="@string/history_toolbar_text"
+            android:textAlignment="viewStart"
+            android:background="@color/colorPrimaryDark"
+            android:theme="?attr/actionBarTheme"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/historyToolbar" android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"

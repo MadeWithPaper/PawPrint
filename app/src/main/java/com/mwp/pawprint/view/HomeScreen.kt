@@ -504,6 +504,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 Log.i(TAG, "nav item works")
                 val intent = Intent(this, Profile::class.java)
                 intent.putExtra("currUser", currUser)
+                intent.putExtra("currUserID", currUid)
                 startActivity(intent)
             }
 

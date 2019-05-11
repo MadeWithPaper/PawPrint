@@ -9,25 +9,19 @@
         tools:context=".view.FoodRecall">
 
     <androidx.appcompat.widget.Toolbar
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:id="@+id/recallAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:titleTextColor="#fff"
+            app:title="Food Recall"
+            android:textAlignment="viewStart"
+            android:background="@color/colorPrimaryDark"
             android:theme="?attr/actionBarTheme"
-            android:minHeight="?attr/actionBarSize"
-            android:id="@+id/foodRecall_toolbar"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="1.0"/>
-    <TextView
-            android:text="Pet Food Recall"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:textColor="#000"
-            android:id="@+id/foodRecall_toolBarTV" app:layout_constraintStart_toStartOf="@+id/foodRecall_toolbar"
-            app:layout_constraintEnd_toEndOf="@+id/foodRecall_toolbar" android:layout_marginEnd="8dp"
-            app:layout_constraintTop_toTopOf="@+id/foodRecall_toolbar"
-            app:layout_constraintBottom_toBottomOf="@+id/foodRecall_toolbar"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -36,6 +30,6 @@
             android:id="@+id/foodRecall_RV"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/foodRecall_toolbar"/>
+            app:layout_constraintTop_toBottomOf="@id/recallAppBar"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

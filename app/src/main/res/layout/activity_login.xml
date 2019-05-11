@@ -29,14 +29,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="35sp"
             android:layout_marginEnd="40dp"
-            android:layout_marginBottom="50dp"
             android:textColor="#fff"
             app:cornerRadius="40dp"
             android:backgroundTint="@color/ColorSecondaryDark"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/signUp_button"
-            android:layout_marginStart="5dp"/>
+            android:layout_marginStart="5dp" android:layout_marginBottom="80dp"/>
 
     <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -49,7 +48,7 @@
             android:textSize="35sp"
             android:background="#fff"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="80dp"
             app:cornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -63,7 +62,7 @@
             android:layout_marginStart="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="50dp"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="50dp"
             app:layout_constraintTop_toBottomOf="@+id/app_logo"
             android:hint="@string/email_tf_hint">
 
@@ -107,8 +106,8 @@
 
     <ProgressBar
             style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="81dp"
+            android:layout_height="89dp"
             android:id="@+id/loginProgressBar"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="10dp"
@@ -118,9 +117,8 @@
             android:indeterminate="true"
             android:visibility="invisible"
             app:layout_constraintTop_toBottomOf="@+id/app_logo"
-            app:layout_constraintBottom_toTopOf="@+id/login_email_til"
             app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintVertical_bias="1.0"/>
+            android:layout_marginBottom="10dp" app:layout_constraintBottom_toBottomOf="@+id/login_password_til"/>
     <TextView
             android:text="@string/login_error_text"
             android:layout_width="0dp"
@@ -129,9 +127,8 @@
             android:textAlignment="center"
             android:visibility="invisible"
             android:textColor="@color/ColorError"
-            app:layout_constraintBottom_toBottomOf="@+id/loginProgressBar"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="50dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="50dp"/>
+            android:layout_marginEnd="50dp" app:layout_constraintBottom_toTopOf="@+id/login_email_til"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

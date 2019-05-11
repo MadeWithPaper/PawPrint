@@ -34,6 +34,10 @@ class FoodRecall : AppCompatActivity() {
         foodRecall_RV.layoutManager = LinearLayoutManager(this)
         foodRecall_RV.adapter = FoodRecallAdapter(this, recallList)
         foodRecall_RV.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+
+        setSupportActionBar(recallAppBar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
     }
 
     private fun fetchData(){
@@ -96,5 +100,10 @@ class FoodRecall : AppCompatActivity() {
             return unformatted.replace("&amp;", "&", true)
         }
         return unformatted
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }

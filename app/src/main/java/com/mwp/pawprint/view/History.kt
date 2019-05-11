@@ -29,6 +29,9 @@ class History : AppCompatActivity() {
         historyRV.layoutManager = LinearLayoutManager(this@History)
         historyRV.adapter = HistoryEntryAdapter(this@History, emptyList())
         historyRV.addItemDecoration(DividerItemDecoration(this@History, DividerItemDecoration.VERTICAL))
+
+        setSupportActionBar(historyToolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun fetchHistory() {
@@ -80,5 +83,10 @@ class History : AppCompatActivity() {
                 Log.w("HomeScreen", "loadPost:onCancelled", databaseError.toException())
             }
         })
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }
