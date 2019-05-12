@@ -60,12 +60,12 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var mLocationRequest: LocationRequest? = null
     var mLastLocation: Location? = null
     private var mFusedLocationClient: FusedLocationProviderClient? = null
-    private val SEARCH_RADIUS = 100.0
+    private val SEARCH_RADIUS = 100.0 //100
     private lateinit var currUser : User
-    private var nearByList : MutableList<DogPoster> = mutableListOf()
-    private var markers : HashMap<String, Marker> = HashMap()
-    private var nearByMap : HashMap<String, DogPoster> = HashMap()
-    private var nearByMarkerMap :  HashMap<String, DogPoster> = HashMap()
+//    private var nearByList : MutableList<DogPoster> = mutableListOf()
+//    private var markers : HashMap<String, Marker> = HashMap()
+//    private var nearByMap : HashMap<String, DogPoster> = HashMap()
+//    private var nearByMarkerMap :  HashMap<String, DogPoster> = HashMap()
     private lateinit var currUid: String
     private val TAG = "HomeScreen"
     private val PET_STORE = "pet_store"
@@ -78,7 +78,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     private var mapCircle : Circle? = null
     private var mapDot : Circle? = null
 
-    //TODO optimize map for activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
@@ -185,6 +184,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             mFusedLocationClient?.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
             mMap.isMyLocationEnabled = false
         }
+
+
     }
 
     private var mLocationCallback: LocationCallback = object : LocationCallback() {
@@ -201,7 +202,20 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL))
                     getNearBy(latLng)
                     getNearByPlaces()
+                    addMarkersToMap()
                 }
+        }
+    }
+
+    private fun addMarkersToMap(){
+        App.nearByDogPoster.forEach {
+            val marker = mMap.addMarker(MarkerOptions()
+                        .position(LatLng(it.lat, it.lon))
+                        .title(it.name)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.paw_icon)))
+                marker.showInfoWindow()
+
+            App.nearByLostDogPostMarkers[it.postID] = marker
         }
     }
 
@@ -276,37 +290,42 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
             }
 
             override fun onKeyEntered(key: String?, location: GeoLocation?) {
+                //Toast.makeText(this@HomeScreen, "geo fire entered $key", Toast.LENGTH_SHORT).show()
                 getDogByPostID(key!!, object : CustomCallBack {
                     override fun onCallBack(value: Any) {
                         val d = value as DogPoster
-                        val marker = mMap.addMarker(MarkerOptions()
-                            .position(LatLng(d.lat, d.lon))
-                            .title(d.name)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.paw_icon)))
-
-                        marker.showInfoWindow()
+                        App.nearByDogPoster.add(d)
+//                        val marker = mMap.addMarker(MarkerOptions()
+//                            .position(LatLng(d.lat, d.lon))
+//                            .title(d.name)
+//                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.paw_icon)))
+//
+//                        marker.showInfoWindow()
                         addToHistory(currUid, d)
-                        nearByMap[key] = d
-                        nearByMarkerMap[marker.id] = d
-                        markers[key] = marker
-                        Log.d(TAG, "map " + nearByMap.values)
-                        Log.d(TAG, "markers" + markers.values)
-                        nearByList.clear()
-                        nearByList.addAll(nearByMap.values)
-                        homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, nearByList)
-                        homeScreen_RV.adapter!!.notifyDataSetChanged()
-                        Log.d(TAG, "list $nearByList")
+//                        nearByMap[key] = d
+//                        nearByMarkerMap[marker.id] = d
+//                        markers[key] = marker
+//                        Log.d(TAG, "map " + nearByMap.values)
+//                        Log.d(TAG, "markers" + markers.values)
+//                        nearByList.clear()
+//                        nearByList.addAll(nearByMap.values)
+                        homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, App.nearByDogPoster.toList())
+                        //homeScreen_RV.adapter!!.notifyDataSetChanged()
+//                        Log.d(TAG, "list $nearByList")
                     }
                 })
 
             }
 
             override fun onKeyExited(key: String?) {
-                //Toast.makeText(this@HomeScreen, "Leaving " + key, Toast.LENGTH_SHORT).show()
-                Log.i(TAG, "Leaving $key")
-                markers.remove(key)
-                nearByMap.remove(key)
-                //mMap.clear()
+                Toast.makeText(this@HomeScreen, "Leaving $key", Toast.LENGTH_SHORT).show()
+//                Log.i(TAG, "Leaving $key")
+//                markers.remove(key)
+//                nearByMap.remove(key)
+                //App.nearByLostDogPostMarkers.remove(key)
+                //App.nearByDogPoster.removeIf{it.postID == key}
+                App.nearByDogPoster.clear()
+                mMap.clear()
             }
 
             override fun onKeyMoved(key: String?, location: GeoLocation?) {
@@ -320,8 +339,8 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     val mMapClickListener : GoogleMap.OnMarkerClickListener = object : GoogleMap.OnMarkerClickListener {
         override fun onMarkerClick(marker: Marker?): Boolean {
             //marker!!.hideInfoWindow()
-            if (nearByMarkerMap.containsKey(marker!!.id)) {
-                val d = nearByMarkerMap[marker!!.id]
+            if (App.nearByLostDogPostMarkers.containsKey(marker!!.id)) {
+                val d = App.nearByDogPoster.find { it.postID == marker.id }
                 val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
                 intent.putExtra("dogPoster", d)
                 startActivity(intent)

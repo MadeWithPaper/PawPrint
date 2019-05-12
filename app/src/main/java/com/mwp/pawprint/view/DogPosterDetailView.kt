@@ -52,9 +52,7 @@ class DogPosterDetailView : AppCompatActivity() {
             Log.d(TAG, "user null, should never happen")
         }
         dogPosterDetailNameTV.text = "Name: ${post.name}"
-
         dogPosterDetailNumberTV.text = "Contact: ${post.contactNumber}"
-
         dogPosterDetailDescTV.text = post.details
 
         if (post.lastSeen == "") {
@@ -104,6 +102,10 @@ class DogPosterDetailView : AppCompatActivity() {
 
         dogPosterDetail_messageFAB.setOnClickListener{
             startActivity(Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", post.contactNumber, null)))
+        }
+
+        dogPosterDetail_back.setOnClickListener {
+            this.onBackPressed()
         }
     }
 

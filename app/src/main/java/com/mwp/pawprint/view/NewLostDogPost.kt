@@ -57,6 +57,7 @@ class NewLostDogPost : AppCompatActivity() {
     private var picUrls = mutableListOf<String>()
     private val cropHeight = 700
     private val cropWidth = 800
+    private val SCALE_FACTOR = 50
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,10 @@ class NewLostDogPost : AppCompatActivity() {
 //        phoneNumberFormattingTextWatcher.onTextChanged("-", 1, 5, 3)
 
         lostDog_contact_et.addTextChangedListener(PhoneNumberFormattingTextWatcher())
+
+        lostDog_back.setOnClickListener {
+            this.onBackPressed()
+        }
     }
 
     private var mCompletionListener : GeoFire.CompletionListener =
@@ -266,8 +271,12 @@ class NewLostDogPost : AppCompatActivity() {
     private fun uploadImage(uri: Uri, id: String, index: Int, currUid: String) {
         val storageRef =  FirebaseStorage.getInstance().reference
         val imageRef = storageRef.child("DogPosterPic/$id/$id$index.jpeg")
+        val bmp = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+        val baos = ByteArrayOutputStream()
+        bmp.compress(Bitmap.CompressFormat.JPEG, SCALE_FACTOR, baos)
+        val data = baos.toByteArray()
 
-        val urlTask = imageRef.putFile(uri).continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+        val urlTask = imageRef.putBytes(data).continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
             if (!task.isSuccessful) {
                 task.exception?.let {
                     throw it

@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.DogPostAdapter"
+        android:background="#fff"
         android:maxHeight="80dp">
 
     <TextView
@@ -15,10 +16,15 @@
             android:textSize="30sp"
             android:textColor="#000"
             android:textAlignment="textStart"
+            android:background="#fff"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/postCell_Pic" android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp" android:layout_marginEnd="10dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="10dp" app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintStart_toEndOf="@+id/postCell_Pic"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     <ImageView
             android:layout_width="80dp"
             android:layout_height="80dp" tools:src="@drawable/default_dog"
