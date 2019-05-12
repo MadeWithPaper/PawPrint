@@ -214,10 +214,21 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                         .title(it.name)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.paw_icon)))
                 marker.showInfoWindow()
-
-            App.nearByLostDogPostMarkers[it.postID] = marker
+                marker.tag = it
         }
     }
+
+    private val mMapClickListener : GoogleMap.OnMarkerClickListener =
+        GoogleMap.OnMarkerClickListener { marker ->
+            Log.i("HomeScren", "marker clicked")
+            if (marker.tag != null) {
+                val d = marker!!.tag as DogPoster
+                val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
+                intent.putExtra("dogPoster", d)
+                startActivity(intent)
+            }
+            false
+        }
 
     private fun setSearchCircle(loc : LatLng) {
         if (mMap != null) {
@@ -341,21 +352,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
             }
         })
-    }
-
-    val mMapClickListener : GoogleMap.OnMarkerClickListener = object : GoogleMap.OnMarkerClickListener {
-        override fun onMarkerClick(marker: Marker?): Boolean {
-            //marker!!.hideInfoWindow()
-            if (App.nearByLostDogPostMarkers.containsKey(marker!!.id)) {
-                val d = App.nearByDogPoster.values.find { it.postID == marker.id }
-                val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
-                intent.putExtra("dogPoster", d)
-                startActivity(intent)
-            } else {
-                //near by place clicked on do nothing as of now
-            }
-            return false
-        }
     }
 
     private fun addToHistory(currUid: String, post : DogPoster) {
