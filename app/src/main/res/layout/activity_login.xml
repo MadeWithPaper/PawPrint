@@ -20,38 +20,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-    <com.google.android.material.button.MaterialButton
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:text="@string/log_in_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/login_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="35sp"
-            android:layout_marginEnd="40dp"
-            android:textColor="#fff"
-            app:cornerRadius="40dp"
-            android:backgroundTint="@color/ColorSecondaryDark"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/signUp_button"
-            android:layout_marginStart="5dp" android:layout_marginBottom="80dp"/>
-
-    <com.google.android.material.button.MaterialButton
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="@string/sign_up_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/signUp_button"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="40dp"
-            android:textSize="35sp"
-            android:background="#fff"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:layout_marginBottom="80dp"
-            app:cornerRadius="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
     <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
@@ -131,4 +99,46 @@
             android:layout_marginStart="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="50dp" app:layout_constraintBottom_toTopOf="@+id/login_email_til"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="@string/sign_up_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/signUp_button"
+                android:textSize="35sp"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:background="#fff"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:cornerRadius="40dp"
+        />
+        <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:text="@string/log_in_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/login_button"
+                android:textSize="35sp"
+                android:textColor="#fff"
+                app:cornerRadius="40dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="30dp"
+                android:backgroundTint="@color/ColorSecondaryDark"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
