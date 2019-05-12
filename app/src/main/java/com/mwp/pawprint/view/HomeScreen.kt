@@ -110,7 +110,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         //recycler list view
         homeScreen_RV.layoutManager = LinearLayoutManager(this)
-        homeScreen_RV.adapter = DogPostAdapter(this, emptyList())
+        homeScreen_RV.adapter = DogPostAdapter(this, App.nearByDogPoster.values.toList())
         homeScreen_RV.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         //places api
@@ -208,7 +208,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun addMarkersToMap(){
-        App.nearByDogPoster.forEach {
+        App.nearByDogPoster.values.forEach {
             val marker = mMap.addMarker(MarkerOptions()
                         .position(LatLng(it.lat, it.lon))
                         .title(it.name)
@@ -294,7 +294,6 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 getDogByPostID(key!!, object : CustomCallBack {
                     override fun onCallBack(value: Any) {
                         val d = value as DogPoster
-                        App.nearByDogPoster.add(d)
 //                        val marker = mMap.addMarker(MarkerOptions()
 //                            .position(LatLng(d.lat, d.lon))
 //                            .title(d.name)
@@ -309,8 +308,16 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 //                        Log.d(TAG, "markers" + markers.values)
 //                        nearByList.clear()
 //                        nearByList.addAll(nearByMap.values)
-                        homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, App.nearByDogPoster.toList())
-                        //homeScreen_RV.adapter!!.notifyDataSetChanged()
+
+                        // Save state
+                        val recyclerViewState = homeScreen_RV.getLayoutManager()?.onSaveInstanceState()
+
+                        App.nearByDogPoster[key] = d
+                        homeScreen_RV.adapter = DogPostAdapter(this@HomeScreen, App.nearByDogPoster.values.toList())
+                        homeScreen_RV.adapter!!.notifyDataSetChanged()
+
+                        // Restore state
+                        homeScreen_RV.getLayoutManager()?.onRestoreInstanceState(recyclerViewState)
 //                        Log.d(TAG, "list $nearByList")
                     }
                 })
@@ -324,12 +331,12 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
 //                nearByMap.remove(key)
                 //App.nearByLostDogPostMarkers.remove(key)
                 //App.nearByDogPoster.removeIf{it.postID == key}
-                App.nearByDogPoster.clear()
+                App.nearByDogPoster.remove(key)
                 mMap.clear()
             }
 
             override fun onKeyMoved(key: String?, location: GeoLocation?) {
-               // Toast.makeText(this@HomeScreen, "found in move" + key, Toast.LENGTH_SHORT).show()
+               // Toast.makeText(this@HomeScreen, "found in move" + key, Toast.LENGTH_SHORT).show()\
                 Log.i(TAG, "key moved $key")
 
             }
@@ -340,7 +347,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
         override fun onMarkerClick(marker: Marker?): Boolean {
             //marker!!.hideInfoWindow()
             if (App.nearByLostDogPostMarkers.containsKey(marker!!.id)) {
-                val d = App.nearByDogPoster.find { it.postID == marker.id }
+                val d = App.nearByDogPoster.values.find { it.postID == marker.id }
                 val intent = Intent(this@HomeScreen, DogPosterDetailView::class.java)
                 intent.putExtra("dogPoster", d)
                 startActivity(intent)
