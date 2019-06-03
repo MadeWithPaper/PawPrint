@@ -10,7 +10,7 @@ interface PlacesEndpointInterface {
     fun getNearBy(@Query("location") location : String,
                 @Query("radius") radius : Int,
                 @Query("key") apiKey : String,
-                @Query("type") type : String,
-                @Query("opennow") open : Boolean
+                @Query("types") type : String,
+                @Query("open_now") open : Boolean
                 ) : Observable<Places>
 }

@@ -36,7 +36,6 @@ class Login : AppCompatActivity() {
 
         login_button.setOnClickListener {
             loginProgressBar.visibility = View.VISIBLE
-            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             logIn()
         }
 
@@ -71,17 +70,19 @@ class Login : AppCompatActivity() {
 
     private fun logIn(){
         //TODO remove in release
-        val testMode = true
+        val testMode = false
         var email = ""
         var password = ""
         if (testMode) {
             email = "test1@gmail.com"
-            password = "1234567"
+            password = "123456"
         } else {
             if (!validateForm()) {
                 //one or more fileds are empty
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 return
             }
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             email = login_email_et.text.toString()
             password = login_password_et.text.toString()
         }

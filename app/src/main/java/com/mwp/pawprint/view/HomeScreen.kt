@@ -407,7 +407,7 @@ class HomeScreen : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNav
                 .subscribe(this::handleResponse))
 
             //google places api call for pet store
-            compositeDisposable?.add(requestInterface.getNearBy("${mLastLocation!!.latitude}, ${mLastLocation!!.longitude}", radius, apiKey, PET_STORE, true)
+            compositeDisposable?.add(requestInterface.getNearBy("37.320858, -121.993382", radius, apiKey, PET_STORE, false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleResponse))
